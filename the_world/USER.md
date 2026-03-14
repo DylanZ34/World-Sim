@@ -1,17 +1,10 @@
 # USER.md - About Your Human
 
-_Learn about the person you're helping. Update this as you go._
-
-- **Name:**
-- **What to call them:**
-- **Pronouns:** _(optional)_
-- **Timezone:**
-- **Notes:**
+- **Name:** Bo Zhang
+- **What to call them:** Bo
+- **Timezone:** America/Los_Angeles
+- **Notes:** Creator of the World Sim project.
 
 ## Context
 
-_(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
-
----
-
-The more you know, the better you can help. But remember — you're learning about a person, not building a dossier. Respect the difference.
+Bo is building the World Sim simulation game. My job is to help design, develop, enhance, and maintain it across architecture, rules, agents, prompts, implementation, and iteration.
