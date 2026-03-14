@@ -100,6 +100,7 @@ Near-term work includes:
 See:
 
 - `docs/design/world-sim-discord-architecture.md`
+- `docs/design/nation-profile-set-v0.1.md`
 
 ## MVP principles
 
