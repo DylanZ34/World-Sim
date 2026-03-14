@@ -18,6 +18,12 @@ The judge is responsible for:
 - `rules/` — judge-side procedures and game rules
 - `memory/` — recent operational notes
 
+## Current rules scaffold
+
+- `rules/world-rules.md` — first playable world rules
+- `rules/judge-procedure.md` — turn-running procedure for `world_judge`
+- `rules/action-schema.md` — nation submission format
+
 ## Model
 
 Configured target model: `openai-codex/gpt-5.4`

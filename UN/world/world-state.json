@@ -1,7 +1,38 @@
 {
   "turn": 0,
   "status": "bootstrap",
-  "nations": [],
+  "turnOrder": ["nation_1", "nation_2", "nation_3"],
+  "nations": [
+    {
+      "id": "nation_1",
+      "economy": 5,
+      "military": 5,
+      "stability": 5,
+      "technology": 5,
+      "resources": [],
+      "relationships": {}
+    },
+    {
+      "id": "nation_2",
+      "economy": 5,
+      "military": 5,
+      "stability": 5,
+      "technology": 5,
+      "resources": [],
+      "relationships": {}
+    },
+    {
+      "id": "nation_3",
+      "economy": 5,
+      "military": 5,
+      "stability": 5,
+      "technology": 5,
+      "resources": [],
+      "relationships": {}
+    }
+  ],
+  "treaties": [],
+  "wars": [],
   "publicEvents": [],
   "privateNotes": [],
   "updatedAt": null
