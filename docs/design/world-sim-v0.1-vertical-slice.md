@@ -192,4 +192,21 @@ The vertical slice passes if:
 3. create judge and nation prompt templates
 4. upgrade `UN/world/world-state.json` to the v0.1 schema
 5. create one scripted local simulation test for 3 turns
-6. run the test and inspect the outputs
+6. create one local live-turn orchestrator that reads nation doctrine and writes canonical turn logs
+7. run the tests and inspect the outputs
+
+## Current local runner
+
+The repo now supports two useful local paths:
+
+- `python3 UN/scripts/test_vertical_slice.py` — deterministic scripted 3-turn smoke test
+- `python3 UN/scripts/run_live_turn.py` — generate one new turn by letting each nation workspace produce a package based on its own doctrine and the current canonical state, then let the judge resolve and persist it
+
+`run_live_turn.py` is the first real wiring layer between:
+
+- judge workspace state
+- nation workspaces and their doctrine
+- canonical turn logs
+- persistent world-state updates
+
+It is still heuristic rather than LLM-driven, but it gives the project a runnable spine.

@@ -1,5 +1,5 @@
 {
-  "turn": 3,
+  "turn": 4,
   "status": "running",
   "turnOrder": [
     "nation_1",
@@ -14,40 +14,48 @@
       "force": 4,
       "food": 6,
       "stability": 8,
-      "industry": 8,
+      "industry": 9,
       "relationships": {
-        "nation_2": 4,
+        "nation_2": 5,
         "nation_3": 1
       }
     },
     {
       "id": "nation_2",
       "name": "Aksumite League",
-      "treasury": 8,
+      "treasury": 9,
       "force": 6,
       "food": 5,
       "stability": 6,
-      "industry": 9,
+      "industry": 10,
       "relationships": {
-        "nation_1": 4,
+        "nation_1": 5,
         "nation_3": -2
       }
     },
     {
       "id": "nation_3",
       "name": "Kingdom of Urartu",
-      "treasury": 4,
-      "force": 8,
-      "food": 7,
+      "treasury": 3,
+      "force": 9,
+      "food": 8,
       "stability": 9,
-      "industry": 7,
+      "industry": 8,
       "relationships": {
         "nation_1": 1,
         "nation_2": -2
       }
     }
   ],
-  "treaties": [],
+  "treaties": [
+    {
+      "parties": [
+        "nation_1",
+        "nation_2"
+      ],
+      "type": "trade-understanding"
+    }
+  ],
   "wars": [],
   "publicEvents": [
     "The world enters its first monitored turn under judge supervision.",
@@ -65,7 +73,14 @@
     "- nation_1 chose diplomacy + internal (medium risk).",
     "- nation_2 chose diplomacy + infrastructure (medium risk).",
     "- nation_3 chose infrastructure + diplomacy (low risk).",
-    "- Diplomacy and pressure shifted several bilateral relationships."
+    "- Diplomacy and pressure shifted several bilateral relationships.",
+    "Turn 4 concluded under judge supervision.",
+    "- Republic of Hodges chose diplomacy + infrastructure (medium risk).",
+    "- Aksumite League chose diplomacy + economy (medium risk).",
+    "- Kingdom of Urartu chose military + infrastructure (medium risk).",
+    "- Strong alignment hardened into at least one standing understanding.",
+    "- Tension remains active in at least one bilateral frontier.",
+    "- Status snapshot: nation_1 T7 F4 Food6 S8 I9, nation_2 T9 F6 Food5 S6 I10, nation_3 T3 F9 Food8 S9 I8"
   ],
-  "updatedAt": "2026-03-15T04:24:18.821394+00:00"
+  "updatedAt": "2026-03-15T04:31:01.628118+00:00"
 }
