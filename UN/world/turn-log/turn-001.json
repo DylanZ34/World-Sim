@@ -1,0 +1,220 @@
+{
+  "turn": 1,
+  "packages": [
+    {
+      "turn": 1,
+      "nation": "nation_1",
+      "risk": "medium",
+      "public_message": "Hodges prefers open trade and stable borders.",
+      "actions": [
+        {
+          "type": "diplomacy",
+          "target": "nation_2",
+          "summary": "Offer a limited trade and non-aggression framework.",
+          "intensity": "medium"
+        },
+        {
+          "type": "infrastructure",
+          "target": "none",
+          "summary": "Expand port and customs capacity.",
+          "intensity": "medium"
+        }
+      ]
+    },
+    {
+      "turn": 1,
+      "nation": "nation_2",
+      "risk": "medium",
+      "public_message": "The League seeks profitable routes under respected terms.",
+      "actions": [
+        {
+          "type": "economy",
+          "target": "none",
+          "summary": "Fund caravan and harbor commerce networks.",
+          "intensity": "medium"
+        },
+        {
+          "type": "diplomacy",
+          "target": "nation_1",
+          "summary": "Respond favorably to a limited trade accord with Hodges.",
+          "intensity": "medium"
+        }
+      ]
+    },
+    {
+      "turn": 1,
+      "nation": "nation_3",
+      "risk": "low",
+      "public_message": "Urartu invests first in strength that endures.",
+      "actions": [
+        {
+          "type": "infrastructure",
+          "target": "none",
+          "summary": "Reinforce frontier roads and supply depots.",
+          "intensity": "medium"
+        },
+        {
+          "type": "internal",
+          "target": "none",
+          "summary": "Tighten provincial command discipline.",
+          "intensity": "low"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Republic of Hodges pursued diplomacy toward nation_2: Offer a limited trade and non-aggression framework.",
+    "Republic of Hodges strengthened its domestic base through: Expand port and customs capacity.",
+    "Aksumite League improved its fiscal position through: Fund caravan and harbor commerce networks.",
+    "Aksumite League pursued diplomacy toward nation_1: Respond favorably to a limited trade accord with Hodges.",
+    "Kingdom of Urartu strengthened its domestic base through: Reinforce frontier roads and supply depots.",
+    "Kingdom of Urartu focused inward: Tighten provincial command discipline."
+  ],
+  "deltas": {
+    "relationships": {
+      "nation_1->nation_2": 1,
+      "nation_2->nation_1": 1
+    },
+    "nation_1": {
+      "stats": {
+        "industry": 1
+      }
+    },
+    "nation_2": {
+      "stats": {
+        "treasury": 1,
+        "industry": 1
+      }
+    },
+    "nation_3": {
+      "stats": {
+        "industry": 1,
+        "stability": 1
+      }
+    }
+  },
+  "summary": [
+    "Turn 1: all three nations acted under the v0.1 ruleset.",
+    "- nation_1 chose diplomacy + infrastructure (medium risk).",
+    "- nation_2 chose economy + diplomacy (medium risk).",
+    "- nation_3 chose infrastructure + internal (low risk).",
+    "- Diplomacy and pressure shifted several bilateral relationships."
+  ],
+  "before": {
+    "turn": 1,
+    "status": "ready",
+    "turnOrder": [
+      "nation_1",
+      "nation_2",
+      "nation_3"
+    ],
+    "nations": [
+      {
+        "id": "nation_1",
+        "name": "Republic of Hodges",
+        "treasury": 6,
+        "force": 4,
+        "food": 6,
+        "stability": 7,
+        "industry": 6,
+        "relationships": {
+          "nation_2": 1,
+          "nation_3": 0
+        }
+      },
+      {
+        "id": "nation_2",
+        "name": "Aksumite League",
+        "treasury": 7,
+        "force": 5,
+        "food": 5,
+        "stability": 6,
+        "industry": 6,
+        "relationships": {
+          "nation_1": 1,
+          "nation_3": 0
+        }
+      },
+      {
+        "id": "nation_3",
+        "name": "Kingdom of Urartu",
+        "treasury": 5,
+        "force": 7,
+        "food": 6,
+        "stability": 7,
+        "industry": 5,
+        "relationships": {
+          "nation_1": 0,
+          "nation_2": 0
+        }
+      }
+    ],
+    "treaties": [],
+    "wars": [],
+    "publicEvents": [
+      "The world enters its first monitored turn under judge supervision."
+    ],
+    "updatedAt": null
+  },
+  "after": {
+    "turn": 1,
+    "status": "running",
+    "turnOrder": [
+      "nation_1",
+      "nation_2",
+      "nation_3"
+    ],
+    "nations": [
+      {
+        "id": "nation_1",
+        "name": "Republic of Hodges",
+        "treasury": 6,
+        "force": 4,
+        "food": 6,
+        "stability": 7,
+        "industry": 7,
+        "relationships": {
+          "nation_2": 3,
+          "nation_3": 0
+        }
+      },
+      {
+        "id": "nation_2",
+        "name": "Aksumite League",
+        "treasury": 8,
+        "force": 5,
+        "food": 5,
+        "stability": 6,
+        "industry": 7,
+        "relationships": {
+          "nation_1": 3,
+          "nation_3": 0
+        }
+      },
+      {
+        "id": "nation_3",
+        "name": "Kingdom of Urartu",
+        "treasury": 5,
+        "force": 7,
+        "food": 6,
+        "stability": 8,
+        "industry": 6,
+        "relationships": {
+          "nation_1": 0,
+          "nation_2": 0
+        }
+      }
+    ],
+    "treaties": [],
+    "wars": [],
+    "publicEvents": [
+      "The world enters its first monitored turn under judge supervision.",
+      "Turn 1: all three nations acted under the v0.1 ruleset.",
+      "- nation_1 chose diplomacy + infrastructure (medium risk).",
+      "- nation_2 chose economy + diplomacy (medium risk).",
+      "- nation_3 chose infrastructure + internal (low risk).",
+      "- Diplomacy and pressure shifted several bilateral relationships."
+    ],
+    "updatedAt": null
+  }
+}

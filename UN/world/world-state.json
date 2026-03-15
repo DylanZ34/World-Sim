@@ -1,39 +1,71 @@
 {
-  "turn": 0,
-  "status": "bootstrap",
-  "turnOrder": ["nation_1", "nation_2", "nation_3"],
+  "turn": 3,
+  "status": "running",
+  "turnOrder": [
+    "nation_1",
+    "nation_2",
+    "nation_3"
+  ],
   "nations": [
     {
       "id": "nation_1",
-      "economy": 5,
-      "military": 5,
-      "stability": 5,
-      "technology": 5,
-      "resources": [],
-      "relationships": {}
+      "name": "Republic of Hodges",
+      "treasury": 7,
+      "force": 4,
+      "food": 6,
+      "stability": 8,
+      "industry": 8,
+      "relationships": {
+        "nation_2": 4,
+        "nation_3": 1
+      }
     },
     {
       "id": "nation_2",
-      "economy": 5,
-      "military": 5,
-      "stability": 5,
-      "technology": 5,
-      "resources": [],
-      "relationships": {}
+      "name": "Aksumite League",
+      "treasury": 8,
+      "force": 6,
+      "food": 5,
+      "stability": 6,
+      "industry": 9,
+      "relationships": {
+        "nation_1": 4,
+        "nation_3": -2
+      }
     },
     {
       "id": "nation_3",
-      "economy": 5,
-      "military": 5,
-      "stability": 5,
-      "technology": 5,
-      "resources": [],
-      "relationships": {}
+      "name": "Kingdom of Urartu",
+      "treasury": 4,
+      "force": 8,
+      "food": 7,
+      "stability": 9,
+      "industry": 7,
+      "relationships": {
+        "nation_1": 1,
+        "nation_2": -2
+      }
     }
   ],
   "treaties": [],
   "wars": [],
-  "publicEvents": [],
-  "privateNotes": [],
-  "updatedAt": null
+  "publicEvents": [
+    "The world enters its first monitored turn under judge supervision.",
+    "Turn 1: all three nations acted under the v0.1 ruleset.",
+    "- nation_1 chose diplomacy + infrastructure (medium risk).",
+    "- nation_2 chose economy + diplomacy (medium risk).",
+    "- nation_3 chose infrastructure + internal (low risk).",
+    "- Diplomacy and pressure shifted several bilateral relationships.",
+    "Turn 2: all three nations acted under the v0.1 ruleset.",
+    "- nation_1 chose economy + diplomacy (medium risk).",
+    "- nation_2 chose military + economy (high risk).",
+    "- nation_3 chose military + internal (medium risk).",
+    "- Diplomacy and pressure shifted several bilateral relationships.",
+    "Turn 3: all three nations acted under the v0.1 ruleset.",
+    "- nation_1 chose diplomacy + internal (medium risk).",
+    "- nation_2 chose diplomacy + infrastructure (medium risk).",
+    "- nation_3 chose infrastructure + diplomacy (low risk).",
+    "- Diplomacy and pressure shifted several bilateral relationships."
+  ],
+  "updatedAt": "2026-03-15T04:24:18.821394+00:00"
 }
