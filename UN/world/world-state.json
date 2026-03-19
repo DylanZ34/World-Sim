@@ -1,5 +1,5 @@
 {
-  "turn": 4,
+  "turn": 5,
   "status": "running",
   "turnOrder": [
     "nation_1",
@@ -10,8 +10,8 @@
     {
       "id": "nation_1",
       "name": "Republic of Hodges",
-      "treasury": 7,
-      "force": 4,
+      "treasury": 6,
+      "force": 5,
       "food": 6,
       "stability": 8,
       "industry": 9,
@@ -23,27 +23,27 @@
     {
       "id": "nation_2",
       "name": "Aksumite League",
-      "treasury": 9,
-      "force": 6,
+      "treasury": 8,
+      "force": 7,
       "food": 5,
       "stability": 6,
       "industry": 10,
       "relationships": {
         "nation_1": 5,
-        "nation_3": -2
+        "nation_3": -3
       }
     },
     {
       "id": "nation_3",
       "name": "Kingdom of Urartu",
-      "treasury": 3,
+      "treasury": 2,
       "force": 9,
-      "food": 8,
+      "food": 9,
       "stability": 9,
       "industry": 8,
       "relationships": {
         "nation_1": 1,
-        "nation_2": -2
+        "nation_2": -3
       }
     }
   ],
@@ -53,7 +53,7 @@
         "nation_1",
         "nation_2"
       ],
-      "type": "trade-understanding"
+      "type": "trade-corridor-compact"
     }
   ],
   "wars": [],
@@ -80,7 +80,14 @@
     "- Kingdom of Urartu chose military + infrastructure (medium risk).",
     "- Strong alignment hardened into at least one standing understanding.",
     "- Tension remains active in at least one bilateral frontier.",
-    "- Status snapshot: nation_1 T7 F4 Food6 S8 I9, nation_2 T9 F6 Food5 S6 I10, nation_3 T3 F9 Food8 S9 I8"
+    "- Status snapshot: nation_1 T7 F4 Food6 S8 I9, nation_2 T9 F6 Food5 S6 I10, nation_3 T3 F9 Food8 S9 I8",
+    "Turn 5 concluded under judge supervision.",
+    "- Republic of Hodges chose diplomacy + military (medium risk).",
+    "- Aksumite League chose diplomacy + military (medium risk).",
+    "- Kingdom of Urartu chose military + infrastructure (medium risk).",
+    "- Hodges and Aksum upgraded their standing trade framework into a Renewable Trade Corridor Compact.",
+    "- The Aksum–Urartu frontier entered a higher-alert, heavily patrolled posture; tensions deepened without open conflict.",
+    "- Status snapshot: nation_1 T6 F5 Food6 S8 I9, nation_2 T8 F7 Food5 S6 I10, nation_3 T2 F9 Food9 S9 I8"
   ],
-  "updatedAt": "2026-03-15T04:31:01.628118+00:00"
+  "updatedAt": "2026-03-19T04:24:50.622689Z"
 }

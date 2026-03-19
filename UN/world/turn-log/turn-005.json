@@ -1,0 +1,95 @@
+{
+  "turn": 5,
+  "submittedPackages": [
+    {
+      "turn": 5,
+      "nation": "nation_1",
+      "risk": "medium",
+      "public_message": "The Republic of Hodges reaffirms its trade understanding with the Aksumite League and calls on all parties to avoid frontier provocations while we strengthen lawful commerce and shared prosperity.",
+      "actions": [
+        {
+          "type": "diplomacy",
+          "target": "nation_2",
+          "summary": "Propose upgrading the existing trade-understanding into a 2-turn Renewable Trade Protocol: published tariff schedule on staple goods and tools, a joint customs anti-smuggling hotline, and a monthly dispute panel; offer a narrow confidence-building clause of 48-hour prior notice for major troop movements within 2 days of the shared frontier.",
+          "intensity": "medium"
+        },
+        {
+          "type": "military",
+          "target": "none",
+          "summary": "Establish a Northern Frontier Deterrence Posture: rotate two battalions on a 30-day cycle to border forts, fund rapid-repair of roads to three key crossings, and issue strict rules of engagement (no pursuit across borders, document and publicize incursions) while expanding patrols to deter raiders and prevent escalation.",
+          "intensity": "medium"
+        }
+      ]
+    },
+    {
+      "turn": 5,
+      "nation": "nation_2",
+      "risk": "medium",
+      "public_message": "Aksum reaffirms that commerce is a covenant: ships and caravans that keep faith with our laws will find safe passage and honest measure. Those who threaten the routes will meet an answer proportionate to the insult.",
+      "actions": [
+        {
+          "type": "diplomacy",
+          "target": "nation_1",
+          "summary": "Propose upgrading the existing trade-understanding into a 3-turn Renewable Trade Corridor Compact: (1) standardized tariffs and weights/measures at designated crossings, (2) mutual protection of merchants and compensation for verified seizures by bandits, (3) a quarterly joint customs audit (2 officials exchanged each turn) to reduce smuggling and disputes.",
+          "intensity": "medium"
+        },
+        {
+          "type": "military",
+          "target": "nation_3",
+          "summary": "Initiate a border deterrence package: rotate two mobile columns to conduct scheduled patrols along the nation_3 frontier, establish two forward supply depots (rations, water, arrows/spears) within our side of the border, and announce rules-of-encounter prioritizing interception of raiders while avoiding deep incursions unless attacked.",
+          "intensity": "medium"
+        }
+      ]
+    },
+    {
+      "turn": 5,
+      "nation": "nation_3",
+      "risk": "medium",
+      "public_message": "Urartu will not be surprised on its borders. We seek calm trade with any neighbor who respects clear lines and keeps armed men behind them.",
+      "actions": [
+        {
+          "type": "military",
+          "target": "nation_2",
+          "summary": "Order a 30-day heightened frontier posture on the southern approaches: rotate two field cohorts through border forts, establish twice-daily mounted patrol loops, and begin a controlled stockpiling of arrows, javelins, and grain in the three nearest strongholds; transmit a formal notice to Aksumite commanders that any armed crossing will be met and pushed back.",
+          "intensity": "medium"
+        },
+        {
+          "type": "infrastructure",
+          "target": "none",
+          "summary": "Expand defense-in-depth logistics by upgrading the main highland road linking the capital granaries to the southern forts (stone surfacing on the worst stretches), and build two new sealed grain depots with rainproof storage and a 90-day reserve target for frontier garrisons.",
+          "intensity": "medium"
+        }
+      ]
+    }
+  ],
+  "rulings": [
+    "Hodges and Aksum submitted compatible reciprocal diplomacy packages; the standing trade-understanding is upgraded to a Renewable Trade Corridor Compact (published tariffs/weights, joint customs coordination, dispute handling). Relationship was already at cap (+5), so no further improvement applied.",
+    "All three nations executed medium-intensity military posture actions. Hodges gains modest readiness at fiscal cost. Aksum and Urartu conducted mirrored frontier deterrence measures; neither side conducted cross-border attacks, but mutual posture hardens tension (relationship -1 each direction).",
+    "Urartu's logistics/road/grain-depot infrastructure improves sustained frontier supply (food +1) but imposes near-term fiscal strain (treasury -1)."
+  ],
+  "deltas": {
+    "nationStats": {
+      "nation_1": {"treasury": -1, "force": 1},
+      "nation_2": {"treasury": -1, "force": 1},
+      "nation_3": {"treasury": -1, "food": 1}
+    },
+    "relationships": {
+      "nation_2:nation_3": -1,
+      "nation_3:nation_2": -1
+    },
+    "treaties": {
+      "removed": ["trade-understanding"],
+      "added": ["trade-corridor-compact"]
+    }
+  },
+  "publicSummaryLines": [
+    "TURN SUMMARY — Turn 5: Hodges and Aksum deepen commercial coordination while the Aksum–Urartu frontier enters a more tightly patrolled, higher-alert posture.",
+    "NATION RESULTS — Hodges: trade compact finalized with Aksum; frontier deterrence posture raised (T-1, F+1).",
+    "NATION RESULTS — Aksum: trade compact finalized with Hodges; patrols/depots established facing Urartu (T-1, F+1).",
+    "NATION RESULTS — Urartu: southern frontier on heightened alert; logistics improved via road + grain depots (T-1, Food+1).",
+    "RELATIONSHIP CHANGES — Aksum ↔ Urartu: -1 (now -3, tense). Hodges ↔ Aksum remains +5 (aligned).",
+    "STATE DELTAS — Treaties: trade-understanding upgraded to trade-corridor-compact (Hodges–Aksum).",
+    "NEXT TURN HOOKS — Customs coordination begins immediately; any border incident on the Aksum–Urartu line now carries elevated escalation risk due to mirrored patrol doctrines."
+  ],
+  "createdAt": "2026-03-19T04:24:50.622689Z"
+}
