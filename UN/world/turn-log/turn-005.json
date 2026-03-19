@@ -1,6 +1,93 @@
 {
   "turn": 5,
-  "submittedPackages": [
+  "generatedAt": "2026-03-19T04:26:31.351645+00:00",
+  "before": {
+    "turn": 4,
+    "status": "running",
+    "turnOrder": [
+      "nation_1",
+      "nation_2",
+      "nation_3"
+    ],
+    "nations": [
+      {
+        "id": "nation_1",
+        "name": "Republic of Hodges",
+        "treasury": 7,
+        "force": 4,
+        "food": 6,
+        "stability": 8,
+        "industry": 9,
+        "relationships": {
+          "nation_2": 5,
+          "nation_3": 1
+        }
+      },
+      {
+        "id": "nation_2",
+        "name": "Aksumite League",
+        "treasury": 9,
+        "force": 6,
+        "food": 5,
+        "stability": 6,
+        "industry": 10,
+        "relationships": {
+          "nation_1": 5,
+          "nation_3": -2
+        }
+      },
+      {
+        "id": "nation_3",
+        "name": "Kingdom of Urartu",
+        "treasury": 3,
+        "force": 9,
+        "food": 8,
+        "stability": 9,
+        "industry": 8,
+        "relationships": {
+          "nation_1": 1,
+          "nation_2": -2
+        }
+      }
+    ],
+    "treaties": [
+      {
+        "parties": [
+          "nation_1",
+          "nation_2"
+        ],
+        "type": "trade-understanding"
+      }
+    ],
+    "wars": [],
+    "publicEvents": [
+      "The world enters its first monitored turn under judge supervision.",
+      "Turn 1: all three nations acted under the v0.1 ruleset.",
+      "- nation_1 chose diplomacy + infrastructure (medium risk).",
+      "- nation_2 chose economy + diplomacy (medium risk).",
+      "- nation_3 chose infrastructure + internal (low risk).",
+      "- Diplomacy and pressure shifted several bilateral relationships.",
+      "Turn 2: all three nations acted under the v0.1 ruleset.",
+      "- nation_1 chose economy + diplomacy (medium risk).",
+      "- nation_2 chose military + economy (high risk).",
+      "- nation_3 chose military + internal (medium risk).",
+      "- Diplomacy and pressure shifted several bilateral relationships.",
+      "Turn 3: all three nations acted under the v0.1 ruleset.",
+      "- nation_1 chose diplomacy + internal (medium risk).",
+      "- nation_2 chose diplomacy + infrastructure (medium risk).",
+      "- nation_3 chose infrastructure + diplomacy (low risk).",
+      "- Diplomacy and pressure shifted several bilateral relationships.",
+      "Turn 4 concluded under judge supervision.",
+      "- Republic of Hodges chose diplomacy + infrastructure (medium risk).",
+      "- Aksumite League chose diplomacy + economy (medium risk).",
+      "- Kingdom of Urartu chose military + infrastructure (medium risk).",
+      "- Strong alignment hardened into at least one standing understanding.",
+      "- Tension remains active in at least one bilateral frontier.",
+      "- Status snapshot: nation_1 T7 F4 Food6 S8 I9, nation_2 T9 F6 Food5 S6 I10, nation_3 T3 F9 Food8 S9 I8"
+    ],
+    "updatedAt": "2026-03-15T04:31:01.628118+00:00"
+  },
+  "packages": [
     {
       "turn": 5,
       "nation": "nation_1",
@@ -62,34 +149,279 @@
       ]
     }
   ],
-  "rulings": [
-    "Hodges and Aksum submitted compatible reciprocal diplomacy packages; the standing trade-understanding is upgraded to a Renewable Trade Corridor Compact (published tariffs/weights, joint customs coordination, dispute handling). Relationship was already at cap (+5), so no further improvement applied.",
-    "All three nations executed medium-intensity military posture actions. Hodges gains modest readiness at fiscal cost. Aksum and Urartu conducted mirrored frontier deterrence measures; neither side conducted cross-border attacks, but mutual posture hardens tension (relationship -1 each direction).",
-    "Urartu's logistics/road/grain-depot infrastructure improves sustained frontier supply (food +1) but imposes near-term fiscal strain (treasury -1)."
-  ],
-  "deltas": {
-    "nationStats": {
-      "nation_1": {"treasury": -1, "force": 1},
-      "nation_2": {"treasury": -1, "force": 1},
-      "nation_3": {"treasury": -1, "food": 1}
+  "rawNationReplies": {
+    "nation_1": "{\n  \"turn\": 5,\n  \"nation\": \"nation_1\",\n  \"risk\": \"medium\",\n  \"public_message\": \"The Republic of Hodges reaffirms its trade understanding with the Aksumite League and calls on all parties to avoid frontier provocations while we strengthen lawful commerce and shared prosperity.\",\n  \"actions\": [\n    {\n      \"type\": \"diplomacy\",\n      \"target\": \"nation_2\",\n      \"summary\": \"Propose upgrading the existing trade-understanding into a 2-turn Renewable Trade Protocol: published tariff schedule on staple goods and tools, a joint customs anti-smuggling hotline, and a monthly dispute panel; offer a narrow confidence-building clause of 48-hour prior notice for major troop movements within 2 days of the shared frontier.\",\n      \"intensity\": \"medium\"\n    },\n    {\n      \"type\": \"military\",\n      \"target\": \"none\",\n      \"summary\": \"Establish a Northern Frontier Deterrence Posture: rotate two battalions on a 30-day cycle to border forts, fund rapid-repair of roads to three key crossings, and issue strict rules of engagement (no pursuit across borders, document and publicize incursions) while expanding patrols to deter raiders and prevent escalation.\",\n      \"intensity\": \"medium\"\n    }\n  ]\n}",
+    "nation_2": "{\n  \"turn\": 5,\n  \"nation\": \"nation_2\",\n  \"risk\": \"medium\",\n  \"public_message\": \"Aksum reaffirms that commerce is a covenant: ships and caravans that keep faith with our laws will find safe passage and honest measure. Those who threaten the routes will meet an answer proportionate to the insult.\",\n  \"actions\": [\n    {\n      \"type\": \"diplomacy\",\n      \"target\": \"nation_1\",\n      \"summary\": \"Propose upgrading the existing trade-understanding into a 3-turn Renewable Trade Corridor Compact: (1) standardized tariffs and weights/measures at designated crossings, (2) mutual protection of merchants and compensation for verified seizures by bandits, (3) a quarterly joint customs audit (2 officials exchanged each turn) to reduce smuggling and disputes.\",\n      \"intensity\": \"medium\"\n    },\n    {\n      \"type\": \"military\",\n      \"target\": \"nation_3\",\n      \"summary\": \"Initiate a border deterrence package: rotate two mobile columns to conduct scheduled patrols along the nation_3 frontier, establish two forward supply depots (rations, water, arrows/spears) within our side of the border, and announce rules-of-encounter prioritizing interception of raiders while avoiding deep incursions unless attacked.\",\n      \"intensity\": \"medium\"\n    }\n  ]\n}",
+    "nation_3": "{\n  \"turn\": 5,\n  \"nation\": \"nation_3\",\n  \"risk\": \"medium\",\n  \"public_message\": \"Urartu will not be surprised on its borders. We seek calm trade with any neighbor who respects clear lines and keeps armed men behind them.\",\n  \"actions\": [\n    {\n      \"type\": \"military\",\n      \"target\": \"nation_2\",\n      \"summary\": \"Order a 30-day heightened frontier posture on the southern approaches: rotate two field cohorts through border forts, establish twice-daily mounted patrol loops, and begin a controlled stockpiling of arrows, javelins, and grain in the three nearest strongholds; transmit a formal notice to Aksumite commanders that any armed crossing will be met and pushed back.\",\n      \"intensity\": \"medium\"\n    },\n    {\n      \"type\": \"infrastructure\",\n      \"target\": \"none\",\n      \"summary\": \"Expand defense-in-depth logistics by upgrading the main highland road linking the capital granaries to the southern forts (stone surfacing on the worst stretches), and build two new sealed grain depots with rainproof storage and a 90-day reserve target for frontier garrisons.\",\n      \"intensity\": \"medium\"\n    }\n  ]\n}"
+  },
+  "judge": {
+    "updatedWorldState": {
+      "turn": 5,
+      "status": "running",
+      "turnOrder": [
+        "nation_1",
+        "nation_2",
+        "nation_3"
+      ],
+      "nations": [
+        {
+          "id": "nation_1",
+          "name": "Republic of Hodges",
+          "treasury": 6,
+          "force": 5,
+          "food": 6,
+          "stability": 8,
+          "industry": 9,
+          "relationships": {
+            "nation_2": 5,
+            "nation_3": 1
+          }
+        },
+        {
+          "id": "nation_2",
+          "name": "Aksumite League",
+          "treasury": 8,
+          "force": 7,
+          "food": 5,
+          "stability": 6,
+          "industry": 10,
+          "relationships": {
+            "nation_1": 5,
+            "nation_3": -3
+          }
+        },
+        {
+          "id": "nation_3",
+          "name": "Kingdom of Urartu",
+          "treasury": 2,
+          "force": 9,
+          "food": 9,
+          "stability": 9,
+          "industry": 8,
+          "relationships": {
+            "nation_1": 1,
+            "nation_2": -3
+          }
+        }
+      ],
+      "treaties": [
+        {
+          "parties": [
+            "nation_1",
+            "nation_2"
+          ],
+          "type": "trade-corridor-compact"
+        }
+      ],
+      "wars": [],
+      "publicEvents": [
+        "The world enters its first monitored turn under judge supervision.",
+        "Turn 1: all three nations acted under the v0.1 ruleset.",
+        "- nation_1 chose diplomacy + infrastructure (medium risk).",
+        "- nation_2 chose economy + diplomacy (medium risk).",
+        "- nation_3 chose infrastructure + internal (low risk).",
+        "- Diplomacy and pressure shifted several bilateral relationships.",
+        "Turn 2: all three nations acted under the v0.1 ruleset.",
+        "- nation_1 chose economy + diplomacy (medium risk).",
+        "- nation_2 chose military + economy (high risk).",
+        "- nation_3 chose military + internal (medium risk).",
+        "- Diplomacy and pressure shifted several bilateral relationships.",
+        "Turn 3: all three nations acted under the v0.1 ruleset.",
+        "- nation_1 chose diplomacy + internal (medium risk).",
+        "- nation_2 chose diplomacy + infrastructure (medium risk).",
+        "- nation_3 chose infrastructure + diplomacy (low risk).",
+        "- Diplomacy and pressure shifted several bilateral relationships.",
+        "Turn 4 concluded under judge supervision.",
+        "- Republic of Hodges chose diplomacy + infrastructure (medium risk).",
+        "- Aksumite League chose diplomacy + economy (medium risk).",
+        "- Kingdom of Urartu chose military + infrastructure (medium risk).",
+        "- Strong alignment hardened into at least one standing understanding.",
+        "- Tension remains active in at least one bilateral frontier.",
+        "- Status snapshot: nation_1 T7 F4 Food6 S8 I9, nation_2 T9 F6 Food5 S6 I10, nation_3 T3 F9 Food8 S9 I8",
+        "Turn 5 concluded under judge supervision.",
+        "- Republic of Hodges chose diplomacy + military (medium risk).",
+        "- Aksumite League chose diplomacy + military (medium risk).",
+        "- Kingdom of Urartu chose military + infrastructure (medium risk).",
+        "- Hodges and Aksum upgraded their standing trade framework into a Renewable Trade Corridor Compact.",
+        "- The Aksum\u2013Urartu frontier entered a higher-alert, heavily patrolled posture; tensions deepened without open conflict.",
+        "- Status snapshot: nation_1 T6 F5 Food6 S8 I9, nation_2 T8 F7 Food5 S6 I10, nation_3 T2 F9 Food9 S9 I8"
+      ],
+      "updatedAt": "2026-03-19T04:26:31.351070+00:00"
     },
-    "relationships": {
-      "nation_2:nation_3": -1,
-      "nation_3:nation_2": -1
-    },
-    "treaties": {
-      "removed": ["trade-understanding"],
-      "added": ["trade-corridor-compact"]
+    "publicSummaryLines": [
+      "TURN SUMMARY \u2014 Turn 5: Hodges and Aksum deepen commercial coordination while the Aksum\u2013Urartu frontier enters a more tightly patrolled, higher-alert posture.",
+      "NATION RESULTS \u2014 Hodges: trade compact finalized with Aksum; frontier deterrence posture raised (T-1, F+1).",
+      "NATION RESULTS \u2014 Aksum: trade compact finalized with Hodges; patrols/depots established facing Urartu (T-1, F+1).",
+      "NATION RESULTS \u2014 Urartu: southern frontier on heightened alert; logistics improved via road + grain depots (T-1, Food+1).",
+      "RELATIONSHIP CHANGES \u2014 Aksum \u2194 Urartu: -1 (now -3, tense). Hodges \u2194 Aksum remains +5 (aligned).",
+      "STATE DELTAS \u2014 Treaties: trade-understanding upgraded to trade-corridor-compact (Hodges\u2013Aksum).",
+      "NEXT TURN HOOKS \u2014 Customs coordination begins immediately; any border incident on the Aksum\u2013Urartu line now carries elevated escalation risk due to mirrored patrol doctrines."
+    ],
+    "judgeNotes": [
+      "All packages validated: correct turn=5, correct nation ids, exactly 2 actions each, allowed action types, usable targets/intensities.",
+      "Hodges\u2194Aksum diplomacy was reciprocal and compatible; relationship already at +5 so no further improvement applied (cap).",
+      "Aksum\u2194Urartu executed mirrored medium military postures without declared attack; tension compounds to -3 but not escalated to war.",
+      "Medium posture/infrastructure actions imposed small fiscal strain (treasury -1 each) to pay for rotations/repairs/stockpiles."
+    ],
+    "deltas": {
+      "turnResolved": 5,
+      "nationStats": {
+        "nation_1": {
+          "treasury": -1,
+          "force": 1,
+          "food": 0,
+          "stability": 0,
+          "industry": 0
+        },
+        "nation_2": {
+          "treasury": -1,
+          "force": 1,
+          "food": 0,
+          "stability": 0,
+          "industry": 0
+        },
+        "nation_3": {
+          "treasury": -1,
+          "force": 0,
+          "food": 1,
+          "stability": 0,
+          "industry": 0
+        }
+      },
+      "relationships": {
+        "nation_1->nation_2": 0,
+        "nation_2->nation_1": 0,
+        "nation_2->nation_3": -1,
+        "nation_3->nation_2": -1,
+        "nation_1->nation_3": 0,
+        "nation_3->nation_1": 0
+      },
+      "treaties": {
+        "removed": [
+          {
+            "parties": [
+              "nation_1",
+              "nation_2"
+            ],
+            "type": "trade-understanding"
+          }
+        ],
+        "added": [
+          {
+            "parties": [
+              "nation_1",
+              "nation_2"
+            ],
+            "type": "trade-corridor-compact"
+          }
+        ]
+      },
+      "wars": {
+        "opened": [],
+        "closed": []
+      }
     }
   },
   "publicSummaryLines": [
-    "TURN SUMMARY — Turn 5: Hodges and Aksum deepen commercial coordination while the Aksum–Urartu frontier enters a more tightly patrolled, higher-alert posture.",
-    "NATION RESULTS — Hodges: trade compact finalized with Aksum; frontier deterrence posture raised (T-1, F+1).",
-    "NATION RESULTS — Aksum: trade compact finalized with Hodges; patrols/depots established facing Urartu (T-1, F+1).",
-    "NATION RESULTS — Urartu: southern frontier on heightened alert; logistics improved via road + grain depots (T-1, Food+1).",
-    "RELATIONSHIP CHANGES — Aksum ↔ Urartu: -1 (now -3, tense). Hodges ↔ Aksum remains +5 (aligned).",
-    "STATE DELTAS — Treaties: trade-understanding upgraded to trade-corridor-compact (Hodges–Aksum).",
-    "NEXT TURN HOOKS — Customs coordination begins immediately; any border incident on the Aksum–Urartu line now carries elevated escalation risk due to mirrored patrol doctrines."
+    "TURN SUMMARY \u2014 Turn 5: Hodges and Aksum deepen commercial coordination while the Aksum\u2013Urartu frontier enters a more tightly patrolled, higher-alert posture.",
+    "NATION RESULTS \u2014 Hodges: trade compact finalized with Aksum; frontier deterrence posture raised (T-1, F+1).",
+    "NATION RESULTS \u2014 Aksum: trade compact finalized with Hodges; patrols/depots established facing Urartu (T-1, F+1).",
+    "NATION RESULTS \u2014 Urartu: southern frontier on heightened alert; logistics improved via road + grain depots (T-1, Food+1).",
+    "RELATIONSHIP CHANGES \u2014 Aksum \u2194 Urartu: -1 (now -3, tense). Hodges \u2194 Aksum remains +5 (aligned).",
+    "STATE DELTAS \u2014 Treaties: trade-understanding upgraded to trade-corridor-compact (Hodges\u2013Aksum).",
+    "NEXT TURN HOOKS \u2014 Customs coordination begins immediately; any border incident on the Aksum\u2013Urartu line now carries elevated escalation risk due to mirrored patrol doctrines."
   ],
-  "createdAt": "2026-03-19T04:24:50.622689Z"
+  "after": {
+    "turn": 5,
+    "status": "running",
+    "turnOrder": [
+      "nation_1",
+      "nation_2",
+      "nation_3"
+    ],
+    "nations": [
+      {
+        "id": "nation_1",
+        "name": "Republic of Hodges",
+        "treasury": 6,
+        "force": 5,
+        "food": 6,
+        "stability": 8,
+        "industry": 9,
+        "relationships": {
+          "nation_2": 5,
+          "nation_3": 1
+        }
+      },
+      {
+        "id": "nation_2",
+        "name": "Aksumite League",
+        "treasury": 8,
+        "force": 7,
+        "food": 5,
+        "stability": 6,
+        "industry": 10,
+        "relationships": {
+          "nation_1": 5,
+          "nation_3": -3
+        }
+      },
+      {
+        "id": "nation_3",
+        "name": "Kingdom of Urartu",
+        "treasury": 2,
+        "force": 9,
+        "food": 9,
+        "stability": 9,
+        "industry": 8,
+        "relationships": {
+          "nation_1": 1,
+          "nation_2": -3
+        }
+      }
+    ],
+    "treaties": [
+      {
+        "parties": [
+          "nation_1",
+          "nation_2"
+        ],
+        "type": "trade-corridor-compact"
+      }
+    ],
+    "wars": [],
+    "publicEvents": [
+      "The world enters its first monitored turn under judge supervision.",
+      "Turn 1: all three nations acted under the v0.1 ruleset.",
+      "- nation_1 chose diplomacy + infrastructure (medium risk).",
+      "- nation_2 chose economy + diplomacy (medium risk).",
+      "- nation_3 chose infrastructure + internal (low risk).",
+      "- Diplomacy and pressure shifted several bilateral relationships.",
+      "Turn 2: all three nations acted under the v0.1 ruleset.",
+      "- nation_1 chose economy + diplomacy (medium risk).",
+      "- nation_2 chose military + economy (high risk).",
+      "- nation_3 chose military + internal (medium risk).",
+      "- Diplomacy and pressure shifted several bilateral relationships.",
+      "Turn 3: all three nations acted under the v0.1 ruleset.",
+      "- nation_1 chose diplomacy + internal (medium risk).",
+      "- nation_2 chose diplomacy + infrastructure (medium risk).",
+      "- nation_3 chose infrastructure + diplomacy (low risk).",
+      "- Diplomacy and pressure shifted several bilateral relationships.",
+      "Turn 4 concluded under judge supervision.",
+      "- Republic of Hodges chose diplomacy + infrastructure (medium risk).",
+      "- Aksumite League chose diplomacy + economy (medium risk).",
+      "- Kingdom of Urartu chose military + infrastructure (medium risk).",
+      "- Strong alignment hardened into at least one standing understanding.",
+      "- Tension remains active in at least one bilateral frontier.",
+      "- Status snapshot: nation_1 T7 F4 Food6 S8 I9, nation_2 T9 F6 Food5 S6 I10, nation_3 T3 F9 Food8 S9 I8",
+      "Turn 5 concluded under judge supervision.",
+      "- Republic of Hodges chose diplomacy + military (medium risk).",
+      "- Aksumite League chose diplomacy + military (medium risk).",
+      "- Kingdom of Urartu chose military + infrastructure (medium risk).",
+      "- Hodges and Aksum upgraded their standing trade framework into a Renewable Trade Corridor Compact.",
+      "- The Aksum\u2013Urartu frontier entered a higher-alert, heavily patrolled posture; tensions deepened without open conflict.",
+      "- Status snapshot: nation_1 T6 F5 Food6 S8 I9, nation_2 T8 F7 Food5 S6 I10, nation_3 T2 F9 Food9 S9 I8"
+    ],
+    "updatedAt": "2026-03-19T04:26:31.351070+00:00"
+  }
 }
