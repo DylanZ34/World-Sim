@@ -63,38 +63,51 @@ def agent_deliver(agent_id, message, reply_ch, reply_to, reply_account, timeout_
     return json.loads(sh(cmd, timeout_s + 30))
 
 
-def extract_json(text, turn, nation_id):
+def extract_json_from_text(text, turn, nation_id):
+    """Extract actions from readable nation message."""
     import re
-    text = text.strip()
+    text = text.lower()
     
-    # Try multiple extraction strategies
-    for block in re.findall(r"```json\s*([\s\S]*?)```", text):
-        try:
-            p = json.loads(block.strip())
-            if p.get("turn") == turn and p.get("nation") == nation_id:
-                if "actions" in p and isinstance(p["actions"], list):
-                    return p
-        except:
-            pass
+    actions = []
+    nation_idx = int(nation_id.split('_')[1]) - 1
     
-    # Try raw JSON object anywhere
-    for m in re.finditer(r"\{", text):
-        for end in range(m.end(), len(text)):
-            if text[end] == "}":
-                try:
-                    p = json.loads(text[m.start():end+1])
-                    if p.get("turn") == turn and p.get("nation") == nation_id:
-                        if "actions" in p:
-                            return p
-                except:
-                    pass
+    # Check for territory actions in message content
+    if any(w in text for w in ['buy', 'purchase', 'acquire']):
+        # Find neutral cities (city_X pattern)
+        for m in re.finditer(r'city_(\d+)', text):
+            actions.append({"type": "buy", "target": f"city_{m.group(1)}"})
+            break
     
-    # Lenient: return basic package if turn matches
-    if str(turn) in text and "nation" in text:
-        return {"turn": turn, "nation": nation_id, "risk": "medium", 
-                "actions": [{"type": "economy", "target": "none", "summary": "default", "intensity": "medium"}]}
+    if any(w in text for w in ['army', 'military', 'soldier', 'legion', 'attack', 'conquer', 'war']):
+        for m in re.finditer(r'city_(\d+)', text):
+            actions.append({"type": "army", "source": "city_0", "target": f"city_{m.group(1)}", "unit": "soldier", "count": 1, "mission": "conquer"})
+            break
     
-    raise ValueError("No valid package")
+    if any(w in text for w in ['fortif', 'defense', 'protect']):
+        for m in re.finditer(r'city_(\d+)', text):
+            actions.append({"type": "fortify", "target": f"city_{m.group(1)}"})
+            break
+    
+    if any(w in text for w in ['economy', 'trade', 'invest', 'merchant', 'wealth', 'tax']):
+        actions.append({"type": "economy", "target": "none", "summary": "Expand trade networks", "intensity": "medium"})
+    
+    if any(w in text for w in ['infrastructure', 'road', 'port', 'build']):
+        actions.append({"type": "infrastructure", "target": "none", "summary": "Build infrastructure", "intensity": "medium"})
+    
+    if any(w in text for w in ['diplomacy', 'peace', 'treaty', 'alliance', 'agree']):
+        actions.append({"type": "diplomacy", "target": "nation_2", "summary": "Propose cooperation", "intensity": "medium"})
+    
+    if any(w in text for w in ['internal', 'stability', 'reform', 'order']):
+        actions.append({"type": "internal", "target": "none", "summary": "Strengthen stability", "intensity": "medium"})
+    
+    # Default actions if no match
+    if not actions:
+        actions = [
+            {"type": "economy", "target": "none", "summary": "Standard economy", "intensity": "medium"},
+            {"type": "internal", "target": "none", "summary": "Maintain order", "intensity": "low"}
+        ]
+    
+    return {"turn": turn, "nation": nation_id, "risk": "medium", "actions": actions[:2]}
 
 
 def load_state():
@@ -133,28 +146,20 @@ def get_public_state(state):
 
 
 def build_nation_prompt(turn, nation_id, state, summit_msgs, debug=False):
-    schema = (RULES_DIR / "action-schema.md").read_text()
+    """Build instruction for nation - NO JSON shown in output unless debug."""
     public = get_public_state(state)
-    state_json = json.dumps(public, indent=2)
     nation_names = {"nation_1": "Hodges", "nation_2": "Aksum", "nation_3": "Urartu"}
-    
-    debug_note = "\n\n## DEBUG MODE: ON\nInclude your full JSON in the message as ```json block```" if debug else ""
+    city_names = {c["id"]: c["name"] for c in public.get("cities", {}).values()}
     
     return (
-        f"Turn: {turn}\nNation id: {nation_id}\n"
+        f"Turn {turn} - You are {nation_names.get(nation_id, nation_id)}\n"
         f"Your agenda: {state['nations'][int(nation_id.split('_')[1])-1]['agenda']['name']}\n\n"
-        f"## Your Task\n"
-        f"Post ONE message in #summit with:\n"
-        f"1. Public statement (readable, 1-3 lines) - address @{nation_names.get(nation_id, nation_id)} if targeting\n"
-        f"2. Two actions you take this turn\n\n"
-        "## Available Actions\n"
-        "### TERRITORY (v0.2)\n"
-        "- army: {'type':'army','source':'city_X','target':'city_Y','unit':'soldier','count':1,'mission':'conquer'}\n"
-        "- buy: {'type':'buy','target':'city_X'}  (buy neutral city)\n"
-        "- fortify: {'type':'fortify','target':'city_X'}  (+defense)\n\n"
-        "### LEGACY\n"
-        "- economy, infrastructure, internal, diplomacy, military (v0.1 format)\n\n"
-        f"## Current State\n{state_json}{debug_note}"
+        f"Your task: Post ONE short public message to #summit.\n"
+        f"- If taking territory: Name the target city in your message\n"
+        f"- If diplomacy: Name the nation you're addressing\n"
+        f"- Then just describe what you do (not JSON)\n\n"
+        f"Example: 'We strengthen borders. Investing in city_X fortifications.'\n\n"
+        f"## Current state\n{json.dumps(public, indent=2)}"
     )
 
 
@@ -389,7 +394,7 @@ def main():
             after_id = new_msgs[0]["id"]
             summit_history.extend(new_msgs)
         
-        pkg = extract_json(reply, turn, nation_id)
+        pkg = extract_json_from_text(reply, turn, nation_id)
         packages[nation_id] = pkg
         print(f"    ✓ Got package")
     
