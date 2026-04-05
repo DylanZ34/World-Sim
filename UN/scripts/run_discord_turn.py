@@ -51,10 +51,12 @@ def sh(cmd: list[str], timeout_s: int = 180):
     return proc.stdout
 
 
-def openclaw_message_read(channel: str, target: str, limit: int = 20, after: str | None = None):
+def openclaw_message_read(channel: str, target: str, limit: int = 20, after: str | None = None, before: str | None = None):
     cmd = ["openclaw", "message", "read", "--channel", channel, "--target", target, "--limit", str(limit), "--json"]
     if after:
         cmd += ["--after", after]
+    if before:
+        cmd += ["--before", before]
     out = sh(cmd, timeout_s=180)
     return json.loads(out)
 
@@ -93,32 +95,63 @@ def openclaw_agent_deliver(agent_id: str, message: str, reply_channel: str, repl
     return json.loads(out)
 
 
-def extract_json(text: str):
-    text = text.strip()
+def extract_json_from_content(full_text: str, turn: int, nation_id: str):
+    """Extract a valid JSON turn package from potentially multi-message content."""
+    text = full_text.strip()
+    
+    # Strategy 1: Look for a complete JSON block wrapped in ```json...```
+    # This is the most reliable if the model follows instructions
+    json_blocks = re.findall(r"```json\s*(\{[\s\S]*?\})\s*```", text)
+    for block in json_blocks:
+        try:
+            pkg = json.loads(block)
+            if pkg.get("turn") == turn and pkg.get("nation") == nation_id:
+                if "actions" in pkg and isinstance(pkg.get("actions"), list) and len(pkg["actions"]) == 2:
+                    return pkg
+        except Exception:
+            continue
+    
+    # Strategy 2: Look for any JSON object that looks like a turn package
+    # Find all { ... } patterns and try to parse them
+    # Look for the one with "turn", "nation", "actions"
+    candidates = []
+    depth = 0
+    start = None
+    for i, c in enumerate(text):
+        if c == '{':
+            if depth == 0:
+                start = i
+            depth += 1
+        elif c == '}':
+            depth -= 1
+            if depth == 0 and start is not None:
+                candidate = text[start:i+1]
+                try:
+                    pkg = json.loads(candidate)
+                    if "turn" in pkg and "nation" in pkg and "actions" in pkg:
+                        candidates.append((len(candidate), pkg))
+                except Exception:
+                    pass
+                start = None
+    
+    # Try the largest candidate that matches
+    candidates.sort(key=lambda x: x[0], reverse=True)
+    for _, pkg in candidates:
+        if pkg.get("turn") == turn and pkg.get("nation") == nation_id:
+            actions = pkg.get("actions")
+            if isinstance(actions, list) and len(actions) == 2:
+                return pkg
+    
+    # Strategy 3: desperation - look for any JSON with turn and nation fields
     try:
-        return json.loads(text)
+        # Try the whole text as JSON
+        pkg = json.loads(text)
+        if pkg.get("turn") == turn and pkg.get("nation") == nation_id:
+            return pkg
     except Exception:
         pass
-
-    # Try fenced block
-    m = re.search(r"```(?:json)?\s*(\{.*?\}|\[.*?\])\s*```", text, flags=re.S)
-    if m:
-        return json.loads(m.group(1))
-
-    # Fallback: find last json-ish object
-    starts = [m.start() for m in re.finditer(r"[\{\[]", text)]
-    for start in sorted(starts, reverse=True):
-        snippet = text[start:]
-        for end in range(len(snippet), 0, -1):
-            cand = snippet[:end].rstrip()
-            if not (cand.endswith("}") or cand.endswith("]")):
-                continue
-            try:
-                return json.loads(cand)
-            except Exception:
-                continue
-
-    raise ValueError("Could not extract JSON")
+    
+    raise ValueError("Could not extract valid turn package")
 
 
 def load_text(path: Path) -> str:
@@ -150,14 +183,16 @@ def nation_prompt(turn: int, nation_id: str, state_before: dict) -> str:
     return (
         f"{nation_prompt_md}\n\n"
         f"Turn: {turn}\nNation id: {nation_id}\n\n"
-        "## Output format (IMPORTANT)\n"
-        "You must produce exactly ONE message. It should contain:\n"
+        "## Output format (CRITICAL)\n"
+        "You must produce exactly ONE message. Not two. ONE message.\n"
+        "The message should contain:\n"
         "1. A short public statement (1-3 lines). If any of your 2 actions target another nation, ADDRESS that nation by name at the start.\n"
         "   - If targeting: \"@Urartu, we propose...\"\n"
-        "   - If no target (infrastructure, internal): just your statement as a general announcement.\n"
-        "2. Then a ```json``` block with your full turn package (exactly 2 actions).\n\n"
-        "Example:\n"
-        "```@Urartu, we propose a border conduct memorandum.\nWe believe stability serves all.\n```json\n{\n  \"turn\": 6,\n  \"nation\": \"nation_1\",\n  \"risk\": \"medium\",\n  \"public_message\": \"...\",\n  \"actions\": [...]\n}\n```\n\n"
+        "   - If no target: just your statement as a general announcement.\n"
+        "2. Then a ```json``` code block with your full turn package (exactly 2 actions).\n"
+        "3. NOTHING ELSE - do not send multiple messages.\n\n"
+        "Example of ONE message:\n"
+        "\"@Urartu, we propose a border conduct memorandum. We believe stability serves all.\n```json\n{\n  \"turn\": 6,\n  \"nation\": \"nation_1\",\n  \"risk\": \"medium\",\n  \"public_message\": \"...\",\n  \"actions\": [...]\n}\n```\"\n\n"
         f"Schema:\n{schema}\n\n"
         f"Canonical state (public):\n{briefing}\n"
     )
@@ -168,6 +203,9 @@ def judge_prompt(turn: int, before_state: dict, summit_messages: list[dict]) -> 
     schema = load_text(RULES_DIR / "action-schema.md")
     judge_prompt_md = load_text(ROOT / "prompts" / "judge-turn-prompt.md")
 
+    # Sort messages oldest first
+    sorted_msgs = sorted(summit_messages, key=lambda m: m.get("timestampUtc", ""))
+
     transcript = [
         {
             "id": m.get("id"),
@@ -176,7 +214,7 @@ def judge_prompt(turn: int, before_state: dict, summit_messages: list[dict]) -> 
             "content": m.get("content"),
             "timestampUtc": m.get("timestampUtc"),
         }
-        for m in summit_messages
+        for m in sorted_msgs
     ]
 
     return (
@@ -184,7 +222,7 @@ def judge_prompt(turn: int, before_state: dict, summit_messages: list[dict]) -> 
         f"## Rules\n{judge_proc}\n\n"
         f"## Action schema\n{schema}\n\n"
         f"## BEFORE state\n{json.dumps(before_state, indent=2)}\n\n"
-        "## #summit transcript (all messages since turn start)\n"
+        "## #summit transcript (all messages since turn start, oldest first)\n"
         f"{json.dumps(transcript, indent=2)}\n\n"
         "## Output requirements (JSON only)\n"
         "Return a single JSON object with keys:\n"
@@ -193,6 +231,45 @@ def judge_prompt(turn: int, before_state: dict, summit_messages: list[dict]) -> 
         "- judgeNotes (array of strings)\n"
         "No markdown outside JSON."
     )
+
+
+def collect_nation_packages(summit_msgs: list[dict], turn: int) -> dict:
+    """Collect messages by nation, group sequential messages from same author, extract JSON."""
+    # Sort by timestamp ascending
+    sorted_msgs = sorted(summit_msgs, key=lambda m: m.get("timestampUtc", ""))
+
+    # Group by author
+    by_author = {}
+    for m in sorted_msgs:
+        author = m.get("author", {}).get("username")
+        if not author:
+            continue
+        by_author.setdefault(author, []).append(m)
+
+    # Map usernames to nation IDs
+    USER_TO_NATION = {"Hodge": "nation_1", "Aksum": "nation_2", "Urartu": "nation_3"}
+
+    packages = {}
+
+    for username, msgs in by_author.items():
+        nation_id = USER_TO_NATION.get(username)
+        if not nation_id:
+            continue
+
+        # Concatenate content from all messages from this author (in order)
+        combined_content = "\n".join(m.get("content", "") for m in msgs)
+
+        try:
+            pkg = extract_json_from_content(combined_content, turn, nation_id)
+            packages[nation_id] = pkg
+            print(f"✓ Extracted package for {nation_id} from {len(msgs)} message(s)")
+        except Exception as e:
+            print(f"✗ {nation_id}: failed to extract JSON: {e}")
+            # Print a bit more of the content for debugging
+            preview = combined_content[:400].replace('\n', ' ')
+            print(f"   Preview: {preview}...")
+
+    return packages
 
 
 def main():
@@ -222,49 +299,57 @@ def main():
             timeout_s=600,
         )
 
-    # Poll #summit until we have 3 valid packages.
+    # Poll #summit until we have 3 valid packages OR timeout.
+    # Wait for messages to settle (no new messages for a few seconds)
     packages = {}
     summit_seen = []
     poll_after = after_id
+    last_new_count = 0
+    no_new_counter = 0
 
-    deadline = time.time() + 300  # 5 min
-    while time.time() < deadline and len(packages) < 3:
+    deadline = time.time() + 300  # 5 min max
+    while time.time() < deadline:
+        # Read messages AFTER the turn start marker
         data = openclaw_message_read("discord", SUMMIT_CHANNEL, limit=50, after=poll_after)
         msgs = data.get("payload", {}).get("messages", [])
+        
         if msgs:
+            # Messages come newest-first
             poll_after = msgs[0]["id"]
-            summit_seen.extend(msgs)
+            # Add in reverse to keep oldest-first
+            new_msgs = [m for m in msgs if m["id"] not in {x["id"] for x in summit_seen}]
+            if new_msgs:
+                summit_seen = new_msgs + summit_seen
+                no_new_counter = 0
+            else:
+                no_new_counter += 1
+            
+            # Try to extract packages
+            packages = collect_nation_packages(summit_seen, turn)
+            
+            if len(packages) >= 3:
+                break
+                
+            # If we haven't seen new messages for 2 consecutive checks, wait a bit more
+            if no_new_counter >= 2 and len(packages) < 3:
+                # Wait a bit longer for more messages
+                time.sleep(5)
+                no_new_counter = 0
+        else:
+            time.sleep(2)
 
-            for m in msgs:
-                author = m.get("author", {})
-                username = author.get("username")
-                content = m.get("content") or ""
-
-                nation_id = None
-                if username == "Hodge":
-                    nation_id = "nation_1"
-                elif username == "Aksum":
-                    nation_id = "nation_2"
-                elif username == "Urartu":
-                    nation_id = "nation_3"
-
-                if not nation_id or nation_id in packages:
-                    continue
-
-                try:
-                    pkg = extract_json(content)
-                    if pkg.get("turn") == turn and pkg.get("nation") == nation_id:
-                        packages[nation_id] = pkg
-                except Exception:
-                    continue
-
-        if len(packages) < 3:
-            time.sleep(3)
+        if len(packages) >= 3:
+            break
+            
+        time.sleep(2)
 
     if len(packages) < 3:
-        raise RuntimeError(f"Timed out waiting for nation packages; got {list(packages.keys())}")
+        print(f"Warning: only got packages for {list(packages.keys())}")
+        if not packages:
+            raise RuntimeError(f"Timed out waiting for nation packages; got {list(packages.keys())}")
 
     # Judge adjudicates.
+    print(f"\nProceeding to judge with packages: {list(packages.keys())}")
     judge_run = openclaw_agent_deliver(
         "world_judge",
         judge_prompt(turn, before, summit_seen),
@@ -275,7 +360,12 @@ def main():
     )
 
     judge_text = "\n".join(p.get("text") or "" for p in judge_run.get("result", {}).get("payloads", []))
-    judge_json = extract_json(judge_text)
+    judge_json = extract_json_from_content(judge_text, turn, "world_judge")  # Reuse the robust extractor
+
+    # Handle case where judge didn't return a proper structure
+    if "updatedWorldState" not in judge_json:
+        # Try to find it differently
+        raise ValueError(f"Judge output missing updatedWorldState. Got keys: {list(judge_json.keys())}")
 
     updated = judge_json.get("updatedWorldState")
     if not updated:
@@ -293,7 +383,7 @@ def main():
         "generatedAt": now_iso(),
         "summitAfterId": after_id,
         "summitMessages": summit_seen,
-        "packages": [packages[n] for n in before["turnOrder"]],
+        "packages": [packages[n] for n in before["turnOrder"] if n in packages],
         "judge": judge_json,
         "before": before,
         "after": updated,
@@ -302,12 +392,12 @@ def main():
 
     # Print result to console.
     summary_lines = judge_json.get("publicSummaryLines", [])
-    print(f"Turn {turn} completed. Judge posted to #world-news.")
+    print(f"\n=== Turn {turn} completed ===")
     for line in summary_lines[:6]:
         print(line)
     if DEBUG:
         print("\n[DEBUG] Full JSON:")
-        print(json.dumps(judge_json, indent=2)[:500] + "...")
+        print(json.dumps(judge_json, indent=2)[:800] + "...")
 
 
 if __name__ == "__main__":
