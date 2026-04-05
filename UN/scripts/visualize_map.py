@@ -2,10 +2,15 @@
 """Visualize world map using PIL."""
 
 import json
+from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+ROOT = SCRIPT_DIR.parent.parent  # World-Sim root
+MAP_DIR = ROOT / "world" / "map"
+
 # Load map
-with open("world/map/world-map.json") as f:
+with open(MAP_DIR / "world-map.json") as f:
     graph = json.load(f)
 
 cities = graph["cities"]
@@ -77,5 +82,5 @@ for i, (name, color) in enumerate(legend):
 draw.text((W//2 - 100, H - 30), f"World Map - {len(cities)} Cities, {len(connections)} Connections", fill="black", font=font)
 
 # Save
-img.save("world/map/world-map.png")
-print("Saved: world/map/world-map.png")
+img.save(MAP_DIR / "world-map.png")
+print(f"Saved: {MAP_DIR / 'world-map.png'}")
