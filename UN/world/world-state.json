@@ -1,5 +1,5 @@
 {
-  "turn": 7,
+  "turn": 9,
   "status": "running",
   "turnOrder": [
     "nation_1",
@@ -15,7 +15,7 @@
         "description": "Win through alliances",
         "weight": 30
       },
-      "treasury": 9,
+      "treasury": 10,
       "force": 4,
       "food": 6,
       "stability": 10,
@@ -67,5 +67,129 @@
   "publicEvents": [
     "The world enters its first monitored turn under judge supervision."
   ],
-  "updatedAt": "2026-04-05T22:55:11.424607+00:00"
+  "updatedAt": "2026-04-05T23:36:10.118554+00:00",
+  "cityOwnership": {
+    "city_0": "nation_1",
+    "city_1": "nation_2",
+    "city_2": "nation_3",
+    "city_3": null,
+    "city_4": null,
+    "city_5": "nation_2",
+    "city_6": null,
+    "city_7": null,
+    "city_8": null,
+    "city_9": null
+  },
+  "cities": {
+    "city_0": {
+      "id": "city_0",
+      "name": "Hodges Capital",
+      "x": 0.5,
+      "y": 0.09999999999999998,
+      "population": 8,
+      "fortification": 4,
+      "size": 10,
+      "owner": "nation_1",
+      "units": []
+    },
+    "city_1": {
+      "id": "city_1",
+      "name": "Aksum Capital",
+      "x": 0.8464101615137756,
+      "y": 0.7,
+      "population": 8,
+      "fortification": 4,
+      "size": 10,
+      "owner": "nation_2",
+      "units": []
+    },
+    "city_2": {
+      "id": "city_2",
+      "name": "Urartu Capital",
+      "x": 0.1535898384862246,
+      "y": 0.7000000000000002,
+      "population": 8,
+      "fortification": 4,
+      "size": 10,
+      "owner": "nation_3",
+      "units": []
+    },
+    "city_3": {
+      "id": "city_3",
+      "name": "Canyonvale",
+      "x": 0.33725960185554227,
+      "y": 0.5935173487813754,
+      "population": 4,
+      "fortification": 2,
+      "size": 6,
+      "owner": null,
+      "units": []
+    },
+    "city_4": {
+      "id": "city_4",
+      "name": "Portport",
+      "x": 0.43287558002073023,
+      "y": 0.25868876199252056,
+      "population": 4,
+      "fortification": 2,
+      "size": 6,
+      "owner": null,
+      "units": []
+    },
+    "city_5": {
+      "id": "city_5",
+      "name": "Porthaven",
+      "x": 0.8039233555269399,
+      "y": 0.36320786088039625,
+      "population": 4,
+      "fortification": 2,
+      "size": 6,
+      "owner": "nation_2",
+      "units": []
+    },
+    "city_6": {
+      "id": "city_6",
+      "name": "Mountainport",
+      "x": 0.5028805738891342,
+      "y": 0.5565498539080481,
+      "population": 4,
+      "fortification": 2,
+      "size": 6,
+      "owner": null,
+      "units": []
+    },
+    "city_7": {
+      "id": "city_7",
+      "name": "Valleyville",
+      "x": 0.3221945066999169,
+      "y": 0.7724248178631673,
+      "population": 4,
+      "fortification": 2,
+      "size": 6,
+      "owner": null,
+      "units": []
+    },
+    "city_8": {
+      "id": "city_8",
+      "name": "Canyonhold",
+      "x": 0.44895188518684126,
+      "y": 0.8911182405051772,
+      "population": 4,
+      "fortification": 2,
+      "size": 6,
+      "owner": null,
+      "units": []
+    },
+    "city_9": {
+      "id": "city_9",
+      "name": "Coastford",
+      "x": 0.662530972681511,
+      "y": 0.42470342374918324,
+      "population": 4,
+      "fortification": 2,
+      "size": 6,
+      "owner": null,
+      "units": []
+    }
+  }
 }

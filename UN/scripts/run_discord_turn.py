@@ -417,9 +417,16 @@ def main():
     
     # Post summary
     lines = [f"⚖️ **Turn {turn} Complete**"]
-    lines.append(f"**Actions:** {len(all_notes)}")
+    lines.append(f"**Legend:** T=Treasury, F=Force, Food, S=Stability, I=Industry, Pop=Population, City=Owned")
+    lines.append("")
     for n in state["nations"]:
-        lines.append(f"  {n['id']}: T{n['treasury']} F{n['force']} Food{n['food']} S{n['stability']} I{n['industry']}")
+        nid = n["id"]
+        # Count cities owned
+        city_count = sum(1 for c, o in state.get("cityOwnership", {}).items() if o == nid)
+        # Sum population owned
+        pop_count = sum(state.get("cities", {}).get(c, {}).get("population", 0) 
+                       for c, o in state.get("cityOwnership", {}).items() if o == nid)
+        lines.append(f"  {n['id']}: T{n['treasury']} F{n['force']} Food{n['food']} S{n['stability']} I{n['industry']} Pop={pop_count} City={city_count}")
     msg_send("discord", SUMMIT_CHANNEL, "\n".join(lines), account=JUDGE_ACCOUNT)
     
     print(f"\n=== Turn {turn} done ===")
