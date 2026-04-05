@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Visualize world map using PIL - with natural-looking routes."""
+"""Visualize world map using PIL - with orthogonal routes (like roads)."""
 
 import json
 import math
+import random
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
@@ -23,40 +24,24 @@ img = Image.new("RGB", (W, H), "#f5f5dc")
 draw = ImageDraw.Draw(img)
 
 def scale(x, y):
-    margin = 60
+    margin = 70
     return int(x * (W - 2*margin) + margin), int(y * (H - 2*margin) + margin)
 
-def distance(p1, p2):
-    return math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
+def midpoint(p1, p2):
+    return ((p1[0]+p2[0])/2, (p1[1]+p2[1])/2)
 
-def curve_points(p1, p2, offset=30):
-    """Create a curved route that avoids overlapping city centers."""
-    # Calculate midpoint and offset it perpendicular to the line
-    mid_x = (p1[0] + p2[0]) / 2
-    mid_y = (p1[1] + p2[1]) / 2
-    
-    # Direction vector
-    dx = p2[0] - p1[0]
-    dy = p2[1] - p1[1]
-    d = math.sqrt(dx*dx + dy*dy)
-    if d < 0.001:
-        return [p1, p2]
-    
-    # Perpendicular offset
-    nx = -dy / d * offset
-    ny = dx / d * offset
-    
-    # Add some randomness based on positions (creates variety)
-    import random
-    seed = int(p1[0]*1000 + p1[1]*2000 + p2[0]*100 + p2[1])
-    random.seed(seed)
-    curve = random.choice([-1, 1])
-    
-    mid_x += nx * curve * 0.3
-    mid_y += ny * curve * 0.3
-    
-    # Control point for quadratic curve
-    return [p1, (mid_x, mid_y), p2]
+def ortho_route(p1, p2, offset=25):
+    """Create orthogonal route: horizontal + vertical segments."""
+    # Random choice for which way to go first
+    random.seed(int(p1[0]*100 + p1[1]*200 + p2[0]*10 + p2[1]))
+    if random.random() > 0.5:
+        # Horizontal first: p1 -> midpoint -> p2
+        mid = midpoint(p1, p2)
+        return [p1, (mid[0], p1[1]), (mid[0], mid[1]), (mid[0], mid[1]), (mid[0], p2[1]), p2]
+    else:
+        # Vertical first
+        mid = midpoint(p1, p2)
+        return [p1, (p1[0], mid[1]), (p1[0], mid[1]), (mid[0], mid[1]), (mid[0], p2[1]), p2]
 
 # Colors
 color_map = {
@@ -66,19 +51,20 @@ color_map = {
     None: "#8B8B8B"
 }
 
-# Draw routes first (behind cities)
+# Draw routes first
 for c1, c2 in connections:
     x1, y1 = cities[c1]["x"], cities[c1]["y"]
     x2, y2 = cities[c2]["x"], cities[c2]["y"]
     p1 = scale(x1, y1)
     p2 = scale(x2, y2)
     
-    # Get curve points
-    pts = curve_points((x1,y1), (x2,y2), offset=25)
-    scaled_pts = [scale(p[0], p[1]) for p in pts]
+    # Get orthogonal points
+    pts = ortho_route((x1,y1), (x2,y2), offset=30)
+    scaled = [scale(p[0], p[1]) for p in pts]
     
-    # Draw as quadratic curve
-    draw.line(scaled_pts, fill="#8B4513", width=2)
+    # Draw as thick route
+    for i in range(len(scaled)-1):
+        draw.line([scaled[i], scaled[i+1]], fill="#8B4513", width=3)
 
 # Try font
 try:
@@ -88,29 +74,25 @@ try:
 except:
     font = font_small = font_tiny = ImageFont.load_default()
 
-# Draw cities with borders
-city_radius = {}
+# Draw cities
 for city_id, city in cities.items():
     x, y = scale(city["x"], city["y"])
     owner = city.get("owner")
     color = color_map.get(owner, "#8B8B8B")
     radius = 20 + city["size"] * 4
-    city_radius[city_id] = radius
     
-    # White border
+    # White border  
     draw.ellipse([x-radius-3, y-radius-3, x+radius+3, y+radius+3], fill="white", outline="white")
-    # City color
+    # City
     draw.ellipse([x-radius, y-radius, x+radius, y+radius], fill=color, outline="black", width=2)
     
     # Capital marker
     if city.get("is_capital"):
         draw.ellipse([x-radius+6, y-radius+6, x+radius-6, y+radius-6], fill="#ffe4b5")
-        # Star
-        draw.text((x-8, y-10), "★", fill="black", font=font)
+        draw.text((x-10, y-10), "★", fill="black", font=font)
     
-    # Label offset to not overlap
-    label = city["name"]
-    draw.text((x + radius + 5, y - 6), label, fill="black", font=font_small)
+    # Label
+    draw.text((x + radius + 5, y - 6), city["name"], fill="black", font=font_small)
 
 # Legend
 legend_y = 25
