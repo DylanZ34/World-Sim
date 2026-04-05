@@ -1,5 +1,5 @@
 {
-  "turn": 6,
+  "turn": 16,
   "status": "running",
   "turnOrder": [
     "nation_1",
@@ -10,40 +10,40 @@
     {
       "id": "nation_1",
       "name": "Republic of Hodges",
-      "treasury": 6,
-      "force": 5,
-      "food": 6,
-      "stability": 8,
+      "treasury": 10,
+      "force": 7,
+      "food": 7,
+      "stability": 10,
       "industry": 10,
       "relationships": {
         "nation_2": 5,
-        "nation_3": 3
+        "nation_3": 4
       }
     },
     {
       "id": "nation_2",
       "name": "Aksumite League",
-      "treasury": 9,
-      "force": 7,
-      "food": 5,
-      "stability": 6,
+      "treasury": 10,
+      "force": 8,
+      "food": 6,
+      "stability": 8,
       "industry": 10,
       "relationships": {
         "nation_1": 5,
-        "nation_3": -3
+        "nation_3": 3
       }
     },
     {
       "id": "nation_3",
       "name": "Kingdom of Urartu",
-      "treasury": 3,
-      "force": 9,
+      "treasury": 10,
+      "force": 10,
       "food": 9,
-      "stability": 9,
-      "industry": 9,
+      "stability": 10,
+      "industry": 10,
       "relationships": {
-        "nation_1": 3,
-        "nation_2": -3
+        "nation_1": 4,
+        "nation_2": 3
       }
     }
   ],
@@ -52,6 +52,13 @@
       "parties": [
         "nation_1",
         "nation_2"
+      ],
+      "type": "alignment"
+    },
+    {
+      "parties": [
+        "nation_1",
+        "nation_3"
       ],
       "type": "alignment"
     }
@@ -89,5 +96,5 @@
     "- The Aksum\u2013Urartu frontier entered a higher-alert, heavily patrolled posture; tensions deepened without open conflict.",
     "- Status snapshot: nation_1 T6 F5 Food6 S8 I9, nation_2 T8 F7 Food5 S6 I10, nation_3 T2 F9 Food9 S9 I8"
   ],
-  "updatedAt": "2026-04-05T19:24:50.573971+00:00"
+  "updatedAt": "2026-04-05T19:44:24.500122+00:00"
 }
