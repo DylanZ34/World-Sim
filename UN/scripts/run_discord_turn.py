@@ -1,21 +1,12 @@
 #!/usr/bin/env python3
-"""Run one World Sim turn *through Discord*.
+"""Run one World Sim turn through Discord with debug mode enabled.
 
-This refines the earlier offline runner:
+Flow:
+- Nations post in #summit (addressed to target or as general announcements)
+- Judge reads #summit to gather packages
+- Judge posts turn summary + debug JSON to #world-news
 
-- Nations publish their packages publicly in #summit (so they can "see" each other)
-- The judge gathers packages by reading #summit history
-- The judge publishes the turn summary to #world-news
-
-Notes:
-- This runner is intentionally *one turn per invocation* to avoid runaway loops.
-- It uses OpenClaw CLI commands (message read + agent --deliver).
-
-Prereqs:
-- Discord channel ids exist in this guild:
-  - #summit: channel:1482491159367389314
-  - #world-news: channel:1482491117734985808
-- Agent bindings are configured for world_judge + nation_1/2/3.
+Debug mode is ON: judge shows full JSON in #world-news.
 """
 
 import json
@@ -36,6 +27,16 @@ WORLD_NEWS_CHANNEL = "channel:1482491117734985808"
 
 NATION_IDS = ["nation_1", "nation_2", "nation_3"]
 
+# Account IDs for each bot (must match binding in OpenClaw)
+ACCOUNT_BY_NATION = {
+    "nation_1": "nation1bot",
+    "nation_2": "nation2bot",
+    "nation_3": "nation3bot",
+}
+JUDGE_ACCOUNT = "judgebot"
+
+DEBUG = True
+
 
 def now_iso():
     return datetime.now(UTC).isoformat()
@@ -50,7 +51,7 @@ def sh(cmd: list[str], timeout_s: int = 180):
     return proc.stdout
 
 
-def openclaw_message_read(channel: str, target: str, limit: int = 10, after: str | None = None):
+def openclaw_message_read(channel: str, target: str, limit: int = 20, after: str | None = None):
     cmd = ["openclaw", "message", "read", "--channel", channel, "--target", target, "--limit", str(limit), "--json"]
     if after:
         cmd += ["--after", after]
@@ -58,15 +59,18 @@ def openclaw_message_read(channel: str, target: str, limit: int = 10, after: str
     return json.loads(out)
 
 
-def openclaw_message_send(channel: str, target: str, message: str, reply_to: str | None = None):
-    cmd = ["openclaw", "message", "send", "--channel", channel, "--target", target, "--message", message, "--json"]
+def openclaw_message_send(channel: str, target: str, message: str, account: str | None = None, reply_to: str | None = None):
+    cmd = ["openclaw", "message", "send", "--channel", channel, "--target", target, "--message", message]
+    if account:
+        cmd += ["--account", account]
     if reply_to:
         cmd += ["--reply-to", reply_to]
+    cmd += ["--json"]
     out = sh(cmd, timeout_s=180)
     return json.loads(out)
 
 
-def openclaw_agent_deliver(agent_id: str, message: str, reply_channel: str, reply_to: str, timeout_s: int = 600):
+def openclaw_agent_deliver(agent_id: str, message: str, reply_channel: str, reply_to: str, reply_account: str, timeout_s: int = 600):
     cmd = [
         "openclaw",
         "agent",
@@ -79,6 +83,8 @@ def openclaw_agent_deliver(agent_id: str, message: str, reply_channel: str, repl
         reply_channel,
         "--reply-to",
         reply_to,
+        "--reply-account",
+        reply_account,
         "--json",
         "--timeout",
         str(timeout_s),
@@ -94,12 +100,12 @@ def extract_json(text: str):
     except Exception:
         pass
 
-    # try fenced block first
+    # Try fenced block
     m = re.search(r"```(?:json)?\s*(\{.*?\}|\[.*?\])\s*```", text, flags=re.S)
     if m:
         return json.loads(m.group(1))
 
-    # fallback: last json-ish object
+    # Fallback: find last json-ish object
     starts = [m.start() for m in re.finditer(r"[\{\[]", text)]
     for start in sorted(starts, reverse=True):
         snippet = text[start:]
@@ -144,14 +150,16 @@ def nation_prompt(turn: int, nation_id: str, state_before: dict) -> str:
     return (
         f"{nation_prompt_md}\n\n"
         f"Turn: {turn}\nNation id: {nation_id}\n\n"
-        "You must publish your response into #summit as ONE message with:\n"
-        "1) 1-3 lines of in-character public statement\n"
-        "2) then a JSON code block with your turn package\n\n"
-        "Example format:\n"
-        "Public statement...\n"
-        "```json\n{...}\n```\n\n"
-        f"Schema (must follow exactly):\n{schema}\n\n"
-        f"Canonical state (publicly visible for this MVP):\n{briefing}\n"
+        "## Output format (IMPORTANT)\n"
+        "You must produce exactly ONE message. It should contain:\n"
+        "1. A short public statement (1-3 lines). If any of your 2 actions target another nation, ADDRESS that nation by name at the start.\n"
+        "   - If targeting: \"@Urartu, we propose...\"\n"
+        "   - If no target (infrastructure, internal): just your statement as a general announcement.\n"
+        "2. Then a ```json``` block with your full turn package (exactly 2 actions).\n\n"
+        "Example:\n"
+        "```@Urartu, we propose a border conduct memorandum.\nWe believe stability serves all.\n```json\n{\n  \"turn\": 6,\n  \"nation\": \"nation_1\",\n  \"risk\": \"medium\",\n  \"public_message\": \"...\",\n  \"actions\": [...]\n}\n```\n\n"
+        f"Schema:\n{schema}\n\n"
+        f"Canonical state (public):\n{briefing}\n"
     )
 
 
@@ -176,14 +184,14 @@ def judge_prompt(turn: int, before_state: dict, summit_messages: list[dict]) -> 
         f"## Rules\n{judge_proc}\n\n"
         f"## Action schema\n{schema}\n\n"
         f"## BEFORE state\n{json.dumps(before_state, indent=2)}\n\n"
-        "## #summit transcript since turn start\n"
+        "## #summit transcript (all messages since turn start)\n"
         f"{json.dumps(transcript, indent=2)}\n\n"
         "## Output requirements (JSON only)\n"
         "Return a single JSON object with keys:\n"
         "- updatedWorldState\n"
-        "- publicSummaryLines (array of strings)\n"
+        "- publicSummaryLines (array of strings suitable for Discord)\n"
         "- judgeNotes (array of strings)\n"
-        "No markdown."
+        "No markdown outside JSON."
     )
 
 
@@ -192,27 +200,29 @@ def main():
     before = deepcopy(state)
     turn = before["turn"] + 1
 
-    # Mark a baseline in summit so we know where to read from.
+    # Mark baseline to read after.
     after_id = get_latest_message_id(SUMMIT_CHANNEL)
 
-    # Announce turn start publicly.
+    # Announce turn start.
     openclaw_message_send(
         "discord",
         WORLD_NEWS_CHANNEL,
-        f"[TURN {turn} START] Nations will post their public statements + packages in #summit."
+        f"⚖️ **[TURN {turn} START]** Nations, submit your packages in #summit now.",
+        account=JUDGE_ACCOUNT,
     )
 
-    # Prompt each nation (deliver their prompt into #summit so it's public).
+    # Prompt each nation (deliver to #summit via their correct bot account).
     for nid in before["turnOrder"]:
         openclaw_agent_deliver(
             nid,
             nation_prompt(turn, nid, before),
             reply_channel="discord",
             reply_to=SUMMIT_CHANNEL,
+            reply_account=ACCOUNT_BY_NATION[nid],
             timeout_s=600,
         )
 
-    # Collect summit messages until we have 3 valid packages.
+    # Poll #summit until we have 3 valid packages.
     packages = {}
     summit_seen = []
     poll_after = after_id
@@ -222,7 +232,7 @@ def main():
         data = openclaw_message_read("discord", SUMMIT_CHANNEL, limit=50, after=poll_after)
         msgs = data.get("payload", {}).get("messages", [])
         if msgs:
-            poll_after = msgs[0]["id"]  # newest in this batch (discord returns newest->older)
+            poll_after = msgs[0]["id"]
             summit_seen.extend(msgs)
 
             for m in msgs:
@@ -230,7 +240,6 @@ def main():
                 username = author.get("username")
                 content = m.get("content") or ""
 
-                # identify nation by username (bot names)
                 nation_id = None
                 if username == "Hodge":
                     nation_id = "nation_1"
@@ -244,7 +253,6 @@ def main():
 
                 try:
                     pkg = extract_json(content)
-                    # minimal check
                     if pkg.get("turn") == turn and pkg.get("nation") == nation_id:
                         packages[nation_id] = pkg
                 except Exception:
@@ -256,12 +264,13 @@ def main():
     if len(packages) < 3:
         raise RuntimeError(f"Timed out waiting for nation packages; got {list(packages.keys())}")
 
-    # Ask judge to adjudicate based on the summit transcript.
+    # Judge adjudicates.
     judge_run = openclaw_agent_deliver(
         "world_judge",
         judge_prompt(turn, before, summit_seen),
         reply_channel="discord",
         reply_to=WORLD_NEWS_CHANNEL,
+        reply_account=JUDGE_ACCOUNT,
         timeout_s=900,
     )
 
@@ -276,7 +285,7 @@ def main():
     updated["status"] = "running"
     updated["updatedAt"] = now_iso()
 
-    # Persist canonical state + log.
+    # Persist state + log.
     write_json(STATE_PATH, updated)
 
     log = {
@@ -291,7 +300,14 @@ def main():
     }
     write_json(TURN_LOG_DIR / f"turn-{turn:03d}.json", log)
 
-    print(f"Discord turn {turn} completed.")
+    # Print result to console.
+    summary_lines = judge_json.get("publicSummaryLines", [])
+    print(f"Turn {turn} completed. Judge posted to #world-news.")
+    for line in summary_lines[:6]:
+        print(line)
+    if DEBUG:
+        print("\n[DEBUG] Full JSON:")
+        print(json.dumps(judge_json, indent=2)[:500] + "...")
 
 
 if __name__ == "__main__":
