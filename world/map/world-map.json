@@ -1,0 +1,217 @@
+{
+  "cities": {
+    "city_0": {
+      "id": "city_0",
+      "name": "Hodges Capital",
+      "x": 0.5,
+      "y": 0.09999999999999998,
+      "is_capital": true,
+      "owner": "nation_1",
+      "size": 7,
+      "fortification": 3
+    },
+    "city_1": {
+      "id": "city_1",
+      "name": "Aksum Capital",
+      "x": 0.8464101615137756,
+      "y": 0.7,
+      "is_capital": true,
+      "owner": "nation_2",
+      "size": 7,
+      "fortification": 4
+    },
+    "city_2": {
+      "id": "city_2",
+      "name": "Urartu Capital",
+      "x": 0.1535898384862246,
+      "y": 0.7000000000000002,
+      "is_capital": true,
+      "owner": "nation_3",
+      "size": 6,
+      "fortification": 6
+    },
+    "city_3": {
+      "id": "city_3",
+      "name": "Portwatch",
+      "x": 0.6759529068042601,
+      "y": 0.34020217527571117,
+      "is_capital": false,
+      "owner": null,
+      "size": 3,
+      "fortification": 1
+    },
+    "city_4": {
+      "id": "city_4",
+      "name": "Canyonton",
+      "x": 0.10294598395909366,
+      "y": 0.3388500676330355,
+      "is_capital": false,
+      "owner": null,
+      "size": 5,
+      "fortification": 4
+    },
+    "city_5": {
+      "id": "city_5",
+      "name": "Fortton",
+      "x": 0.7535206362946456,
+      "y": 0.1473121287558805,
+      "is_capital": false,
+      "owner": null,
+      "size": 6,
+      "fortification": 3
+    },
+    "city_6": {
+      "id": "city_6",
+      "name": "Plainport",
+      "x": 0.4898547104040468,
+      "y": 0.6022492448827391,
+      "is_capital": false,
+      "owner": null,
+      "size": 4,
+      "fortification": 3
+    },
+    "city_7": {
+      "id": "city_7",
+      "name": "Riverburg",
+      "x": 0.35993646025012616,
+      "y": 0.1986591394063414,
+      "is_capital": false,
+      "owner": null,
+      "size": 3,
+      "fortification": 2
+    },
+    "city_8": {
+      "id": "city_8",
+      "name": "Plainwatch",
+      "x": 0.6517874278533181,
+      "y": 0.5850295047861883,
+      "is_capital": false,
+      "owner": null,
+      "size": 4,
+      "fortification": 3
+    },
+    "city_9": {
+      "id": "city_9",
+      "name": "Riverburg",
+      "x": 0.38262387436418555,
+      "y": 0.878566193678721,
+      "is_capital": false,
+      "owner": null,
+      "size": 4,
+      "fortification": 1
+    }
+  },
+  "connections": [
+    [
+      "city_0",
+      "city_7"
+    ],
+    [
+      "city_0",
+      "city_5"
+    ],
+    [
+      "city_1",
+      "city_8"
+    ],
+    [
+      "city_1",
+      "city_6"
+    ],
+    [
+      "city_2",
+      "city_9"
+    ],
+    [
+      "city_2",
+      "city_6"
+    ],
+    [
+      "city_3",
+      "city_5"
+    ],
+    [
+      "city_3",
+      "city_8"
+    ],
+    [
+      "city_4",
+      "city_7"
+    ],
+    [
+      "city_2",
+      "city_4"
+    ],
+    [
+      "city_6",
+      "city_8"
+    ],
+    [
+      "city_6",
+      "city_9"
+    ],
+    [
+      "city_0",
+      "city_6"
+    ],
+    [
+      "city_0",
+      "city_4"
+    ],
+    [
+      "city_1",
+      "city_7"
+    ],
+    [
+      "city_2",
+      "city_7"
+    ],
+    [
+      "city_1",
+      "city_2"
+    ],
+    [
+      "city_3",
+      "city_7"
+    ],
+    [
+      "city_4",
+      "city_8"
+    ],
+    [
+      "city_4",
+      "city_6"
+    ],
+    [
+      "city_5",
+      "city_6"
+    ],
+    [
+      "city_4",
+      "city_5"
+    ],
+    [
+      "city_5",
+      "city_7"
+    ],
+    [
+      "city_5",
+      "city_8"
+    ],
+    [
+      "city_1",
+      "city_9"
+    ],
+    [
+      "city_7",
+      "city_9"
+    ]
+  ],
+  "num_cities": 10,
+  "num_seeds": 3,
+  "seed_names": [
+    "Hodges",
+    "Aksum",
+    "Urartu"
+  ]
+}
