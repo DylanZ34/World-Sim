@@ -1,6 +1,6 @@
 {
-  "turn": 1,
-  "status": "ready",
+  "turn": 2,
+  "status": "running",
   "turnOrder": [
     "nation_1",
     "nation_2",
@@ -19,7 +19,7 @@
       "force": 4,
       "food": 6,
       "stability": 7,
-      "industry": 6,
+      "industry": 7,
       "relationships": {
         "nation_2": 1,
         "nation_3": 0
@@ -33,11 +33,11 @@
         "description": "Wealth through trade",
         "weight": 40
       },
-      "treasury": 7,
+      "treasury": 8,
       "force": 5,
       "food": 5,
       "stability": 6,
-      "industry": 6,
+      "industry": 8,
       "relationships": {
         "nation_1": 1,
         "nation_3": 0
@@ -51,11 +51,11 @@
         "description": "Build unstoppable army",
         "weight": 40
       },
-      "treasury": 5,
+      "treasury": 6,
       "force": 7,
       "food": 6,
       "stability": 7,
-      "industry": 5,
+      "industry": 6,
       "relationships": {
         "nation_1": 0,
         "nation_2": 0
@@ -67,5 +67,5 @@
   "publicEvents": [
     "The world enters its first monitored turn under judge supervision."
   ],
-  "updatedAt": "2026-04-05T21:59:24.147694+00:00"
+  "updatedAt": "2026-04-05T22:17:24.284201+00:00"
 }

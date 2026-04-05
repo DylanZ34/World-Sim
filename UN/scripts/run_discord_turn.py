@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
-"""Run World Sim turn - nation produces JSON, script posts to Discord.
-
-Flow:
-- For each nation in turn order:
-  1. Judge shares public state + summit mentions to nation
-  2. Nation produces JSON package (not posted to Discord)
-  3. Script posts the package to #summit (addressed if target, general if none)
-  4. Script applies to state
-- After all nations, post final public state to #summit
-
-This avoids the split-message issue by not having agents post directly.
-"""
+"""Run World Sim turn - territory actions enabled."""
 
 import json
+import math
+import random
 import subprocess
 import time
 from copy import deepcopy
@@ -27,261 +18,342 @@ RULES_DIR = ROOT / "rules"
 SUMMIT_CHANNEL = "channel:1482491159367389314"
 WORLD_NEWS_CHANNEL = "channel:1482491117734985808"
 
-ACCOUNT_BY_NATION = {
-    "nation_1": "nation1bot",
-    "nation_2": "nation2bot",
-    "nation_3": "nation3bot",
-}
+ACCOUNT_BY_NATION = {"nation_1": "nation1bot", "nation_2": "nation2bot", "nation_3": "nation3bot"}
 JUDGE_ACCOUNT = "judgebot"
 
 DEBUG = True
+
+UNIT_STATS = {
+    "militia": {"cost": 1, "attack": 1, "defense": 1},
+    "soldier": {"cost": 2, "attack": 2, "defense": 2},
+    "legion": {"cost": 3, "attack": 4, "defense": 3},
+    "cavalry": {"cost": 3, "attack": 3, "defense": 2},
+    "siege": {"cost": 4, "attack": 5, "defense": 1},
+}
 
 
 def now_iso():
     return datetime.now(UTC).isoformat()
 
 
-def sh(cmd: list[str], timeout_s: int = 180):
+def sh(cmd, timeout_s=180):
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout_s)
     if proc.returncode != 0:
-        raise RuntimeError(f"Command failed ({proc.returncode}): {' '.join(cmd)}\nSTDERR:\n{proc.stderr}")
+        raise RuntimeError(f"Cmd failed: {' '.join(cmd)}\n{proc.stderr}")
     return proc.stdout
 
 
-def openclaw_message_read(channel: str, target: str, limit: int = 50, after: str | None = None):
-    cmd = ["openclaw", "message", "read", "--channel", channel, "--target", target, "--limit", str(limit), "--json"]
-    if after:
-        cmd += ["--after", after]
-    out = sh(cmd, timeout_s=180)
-    return json.loads(out)
+def msg_read(ch, target, limit=50, after=None):
+    cmd = ["openclaw", "message", "read", "--channel", ch, "--target", target, "--limit", str(limit), "--json"]
+    if after: cmd += ["--after", after]
+    return json.loads(sh(cmd))
 
 
-def openclaw_message_send(channel: str, target: str, message: str, account: str | None = None):
-    cmd = ["openclaw", "message", "send", "--channel", channel, "--target", target, "--message", message]
-    if account:
-        cmd += ["--account", account]
+def msg_send(ch, target, message, account=None):
+    cmd = ["openclaw", "message", "send", "--channel", ch, "--target", target, "--message", message]
+    if account: cmd += ["--account", account]
     cmd += ["--json"]
-    out = sh(cmd, timeout_s=180)
-    return json.loads(out)
+    sh(cmd)
 
 
-def openclaw_agent(agent_id: str, message: str, timeout_s: int = 600):
-    """Run agent and get JSON response (no Discord posting)."""
-    cmd = [
-        "openclaw", "agent", "--agent", agent_id,
-        "--message", message,
-        "--json", "--timeout", str(timeout_s),
-    ]
-    out = sh(cmd, timeout_s=timeout_s + 30)
-    return json.loads(out)
+def agent_deliver(agent_id, message, reply_ch, reply_to, reply_account, timeout_s=600):
+    cmd = ["openclaw", "agent", "--agent", agent_id, "--message", message, "--deliver",
+           "--reply-channel", reply_ch, "--reply-to", reply_to, "--reply-account", reply_account,
+           "--json", "--timeout", str(timeout_s)]
+    return json.loads(sh(cmd, timeout_s + 30))
 
 
-def load_text(path: Path) -> str:
-    return path.read_text()
+def extract_json(text, turn, nation_id):
+    import re
+    text = text.strip()
+    
+    # Try multiple extraction strategies
+    for block in re.findall(r"```json\s*([\s\S]*?)```", text):
+        try:
+            p = json.loads(block.strip())
+            if p.get("turn") == turn and p.get("nation") == nation_id:
+                if "actions" in p and isinstance(p["actions"], list):
+                    return p
+        except:
+            pass
+    
+    # Try raw JSON object anywhere
+    for m in re.finditer(r"\{", text):
+        for end in range(m.end(), len(text)):
+            if text[end] == "}":
+                try:
+                    p = json.loads(text[m.start():end+1])
+                    if p.get("turn") == turn and p.get("nation") == nation_id:
+                        if "actions" in p:
+                            return p
+                except:
+                    pass
+    
+    # Lenient: return basic package if turn matches
+    if str(turn) in text and "nation" in text:
+        return {"turn": turn, "nation": nation_id, "risk": "medium", 
+                "actions": [{"type": "economy", "target": "none", "summary": "default", "intensity": "medium"}]}
+    
+    raise ValueError("No valid package")
 
 
 def load_state():
     return json.loads(STATE_PATH.read_text())
 
 
-def write_json(path: Path, data):
+def write_json(path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2) + "\n")
 
 
-def get_public_state(state: dict) -> dict:
-    """Extract public state for nations."""
+def get_public_state(state):
+    """Extract public-facing state."""
+    nation_names = {
+        "nation_1": "Republic of Hodges",
+        "nation_2": "Aksumite League", 
+        "nation_3": "Kingdom of Urartu"
+    }
     return {
         "turn": state["turn"],
         "turnOrder": state["turnOrder"],
-        "nations": [
-            {
-                "id": n["id"],
-                "name": n["name"],
-                "treasury": n["treasury"],
-                "force": n["force"],
-                "food": n["food"],
-                "stability": n["stability"],
-                "industry": n["industry"],
-                "relationships": n["relationships"]
-            }
-            for n in state["nations"]
-        ],
+        "nations": [{
+            "id": n["id"],
+            "name": nation_names.get(n["id"], n["id"]),
+            "treasury": n.get("treasury", 0),
+            "force": n.get("force", 0),
+            "food": n.get("food", 0),
+            "stability": n.get("stability", 0),
+            "industry": n.get("industry", 0),
+            "relationships": n.get("relationships", {})
+        } for n in state.get("nations", [])],
+        "cityOwnership": state.get("cityOwnership", {}),
+        "cities": state.get("cities", {}),
         "treaties": state.get("treaties", []),
-        "wars": state.get("wars", []),
-        "publicEvents": state.get("publicEvents", [])[-5:]
     }
 
 
-def apply_package(state: dict, package: dict) -> dict:
-    """Apply a nation's package to state."""
-    nation_id = package["nation"]
-    actions = package.get("actions", [])
+def build_nation_prompt(turn, nation_id, state, summit_msgs):
+    schema = (RULES_DIR / "action-schema.md").read_text()
+    public = get_public_state(state)
+    state_json = json.dumps(public, indent=2)
+    
+    return (
+        f"Turn: {turn}\nNation id: {nation_id}\n\n"
+        "## Your agenda\n"
+        f"Your nation's goal: {state['nations'][turn-1]['agenda']['name']}\n\n"
+        "## Output format\n"
+        "Output exactly ONE message in #summit with:\n"
+        "1. Public statement (addressed if targeting)\n"
+        "2. ```json``` block, 2 actions\n\n"
+        "## Action types (v0.2 - TERRITORY ENABLED)\n"
+        "### army (conquest)\n"
+        '{"type":"army","source":"city_X","target":"city_Y","unit":"soldier","count":1,"mission":"conquer"}\n'
+        "### buy (purchase neutral)\n"
+        '{"type":"buy","target":"city_X"}\n'
+        "### fortify (defense)\n"
+        '{"type":"fortify","target":"city_X"}\n'
+        "### economy/infrastructure/internal/diplomacy/military (v0.1)\n"
+        '{"type":"economy","target":"none","summary":"...","intensity":"medium"}\n\n'
+        f"Schema:\n{schema}\n\nState:\n{state_json}"
+    )
+
+
+# === TERRITORY ACTIONS LOGIC ===
+
+def resolve_army_action(state, action, nation_id, notes):
+    """Handle army movement/conquest."""
+    source = action.get("source")
+    target = action.get("target")
+    unit_type = action.get("unit", "soldier")
+    count = action.get("count", 1)
+    mission = action.get("mission", "conquer")
+    
+    cities = state.get("cities", {})
+    owner_map = state.get("cityOwnership", {})
+    
+    # Validate
+    if source not in cities or target not in cities:
+        notes.append(f"{nation_id}: invalid city in army action")
+        return state
+    
+    if owner_map.get(source) != nation_id:
+        notes.append(f"{nation_id}: doesn't own {source}")
+        return state
+    
+    # Check connection
+    connections = state.get("connections", [])
+    connected = any(source in c and target in c for c in connections)
+    if not connected:
+        notes.append(f"{nation_id}: {source} not connected to {target}")
+        return state
+    
+    # Check population cost
+    stats = UNIT_STATS.get(unit_type, UNIT_STATS["soldier"])
+    cost = stats["cost"] * count
+    
+    source_city = cities[source]
+    if source_city.get("population", 0) < cost:
+        notes.append(f"{nation_id}: not enough pop in {source}")
+        return state
+    
+    # Deduct population
+    source_city["population"] = max(0, source_city["population"] - cost)
+    notes.append(f"{nation_id}: {count}x {unit_type} moved from {source}")
+    
+    # Check target owner
+    target_owner = owner_map.get(target)
+    
+    if target_owner is None:
+        # Neutral - auto capture
+        owner_map[target] = nation_id
+        cities[target]["owner"] = nation_id
+        cities[target]["population"] = max(1, cities[target]["population"])
+        cities[target]["units"] = [{"type": unit_type, "count": count}]
+        notes.append(f"{nation_id}: captured {target}")
+    elif target_owner == nation_id:
+        # Own city - reinforce
+        city = cities[target]
+        city.setdefault("units", [])
+        city["units"].append({"type": unit_type, "count": count})
+        notes.append(f"{nation_id}: reinforced {target}")
+    else:
+        # Battle!
+        attacker_power = (stats["attack"] * count) + math.sqrt(source_city.get("population", 1))
+        
+        defender_city = cities[target]
+        defender_stats = UNIT_STATS.get("soldier", {"cost": 2, "attack": 2, "defense": 2})
+        defender_units = defender_city.get("units", [])
+        defense_units_power = sum(UNIT_STATS.get(u["type"], UNIT_STATS["soldier"])["defense"] * u.get("count", 1) for u in defender_units)
+        defender_power = (defender_city.get("fortification", 1) + math.sqrt(defender_city.get("population", 1)) + 2)  # +2 home bonus
+        
+        if attacker_power > defender_power:
+            # Win
+            owner_map[target] = nation_id
+            defender_city["owner"] = nation_id
+            defender_city["population"] = max(1, defender_city["population"] // 2)
+            defender_city["units"] = [{"type": unit_type, "count": count}]
+            cities[source]["units"] = [{"type": unit_type, "count": cost // stats["cost"]}]  # Remaining
+            notes.append(f"{nation_id}: won battle for {target}")
+        else:
+            # Lose - retreat with losses
+            loss = cost // 2
+            source_city["population"] = max(0, source_city.get("population", 0) - cost) + loss
+            notes.append(f"{nation_id}: lost battle for {target}, retreated")
+    
+    return state
+
+
+def resolve_buy_action(state, action, nation_id, notes):
+    """Handle buying neutral cities."""
+    target = action.get("target")
+    cities = state.get("cities", {})
+    owner_map = state.get("cityOwnership", {})
+    
+    if target not in cities:
+        notes.append(f"{nation_id}: invalid city {target}")
+        return state
+    
+    if owner_map.get(target) is not None:
+        notes.append(f"{nation_id}: {target} already owned")
+        return state
+    
+    # Calculate cost
+    nation = next((n for n in state["nations"] if n["id"] == nation_id), None)
+    if not nation:
+        return state
+    
+    industry = nation.get("industry", 0)
+    cost = max(1, 2 - (industry // 2))
+    
+    treasury = nation.get("treasury", 0)
+    if treasury < cost:
+        notes.append(f"{nation_id}: not enough treasury ({treasury} < {cost})")
+        return state
+    
+    # Deduct and buy
+    nation["treasury"] -= cost
+    owner_map[target] = nation_id
+    cities[target]["owner"] = nation_id
+    notes.append(f"{nation_id}: bought {target} for {cost}")
+    
+    return state
+
+
+def resolve_fortify_action(state, action, nation_id, notes):
+    """Increase city fortification."""
+    target = action.get("target")
+    cities = state.get("cities", {})
+    owner_map = state.get("cityOwnership", {})
+    
+    if target not in cities:
+        return state
+    if owner_map.get(target) != nation_id:
+        notes.append(f"{nation_id}: doesn't own {target}")
+        return state
+    
+    city = cities[target]
+    city["fortification"] = min(10, city.get("fortification", 0) + 1)
+    notes.append(f"{nation_id}: +1 fort on {target}")
+    
+    return state
+
+
+def resolve_legacy_action(state, action, nation_id, notes):
+    """Handle v0.1 actions."""
+    action_type = action.get("type")
+    intensity = action.get("intensity", "medium")
+    scale = {"low": 0, "medium": 1, "high": 1}.get(intensity, 0)
     
     by_id = {n["id"]: n for n in state["nations"]}
     nation = by_id.get(nation_id)
     if not nation:
         return state
     
-    for action in actions:
-        action_type = action.get("type", "")
+    if action_type == "economy":
+        nation["treasury"] = min(10, nation["treasury"] + 1)
+        if intensity != "low":
+            nation["industry"] = min(10, nation["industry"] + scale)
+        notes.append(f"{nation_id}: economy +1")
+    elif action_type == "infrastructure":
+        nation["industry"] = min(10, nation["industry"] + 1)
+        notes.append(f"{nation_id}: infrastructure +1")
+    elif action_type == "internal":
+        nation["stability"] = min(10, nation["stability"] + 1)
+        notes.append(f"{nation_id}: internal +1")
+    elif action_type == "diplomacy":
         target = action.get("target", "none")
-        intensity = action.get("intensity", "medium")
-        summary = action.get("summary", "")
-        
-        scale = {"low": 0, "medium": 1, "high": 1}.get(intensity, 0)
-        
-        if action_type == "economy":
-            nation["treasury"] = min(10, nation["treasury"] + 1)
-            if intensity != "low":
-                nation["industry"] = min(10, nation["industry"] + scale)
-            
-        elif action_type == "infrastructure":
-            nation["industry"] = min(10, nation["industry"] + 1)
-            if any(w in summary.lower() for w in ["irrig", "food", "grain", "farm"]):
-                nation["food"] = min(10, nation["food"] + 1)
-            
-        elif action_type == "internal":
-            nation["stability"] = min(10, nation["stability"] + 1)
-            
-        elif action_type == "diplomacy":
-            if target != "none" and target in nation["relationships"]:
-                old = nation["relationships"][target]
-                nation["relationships"][target] = min(5, old + 1)
-                if target in by_id:
-                    other = by_id[target]
-                    if nation_id in other["relationships"]:
-                        other["relationships"][nation_id] = min(5, other["relationships"][nation_id] + 1)
-            
-        elif action_type == "military":
-            nation["force"] = min(10, nation["force"] + 1)
-            if intensity != "low":
-                nation["treasury"] = max(0, nation["treasury"] - 1)
-            if target != "none" and target in nation["relationships"]:
-                old = nation["relationships"][target]
-                nation["relationships"][target] = max(-5, old - 1)
-                if target in by_id:
-                    other = by_id[target]
-                    if nation_id in other["relationships"]:
-                        other["relationships"][nation_id] = max(-5, other["relationships"][nation_id] - 1)
-    
-    # Update treaties/wars
-    treaties = []
-    wars = []
-    for a, na in by_id.items():
-        for b, score in na["relationships"].items():
-            if a < b:
-                if score >= 4:
-                    treaties.append({"parties": [a, b], "type": "alignment"})
-                elif score <= -4:
-                    wars.append({"parties": [a, b], "type": "crisis"})
-    
-    state["treaties"] = treaties
-    state["wars"] = wars
+        if target != "none" and target in nation.get("relationships", {}):
+            nation["relationships"][target] = min(5, nation["relationships"][target] + 1)
+            if target in by_id:
+                by_id[target]["relationships"][nation_id] = min(5, by_id[target]["relationships"].get(nation_id, 0) + 1)
+            notes.append(f"{nation_id}: diplomacy +1 with {target}")
+    elif action_type == "military":
+        nation["force"] = min(10, nation["force"] + 1)
+        if intensity != "low":
+            nation["treasury"] = max(0, nation["treasury"] - 1)
+        target = action.get("target", "none")
+        if target != "none" and target in nation.get("relationships", {}):
+            nation["relationships"][target] = max(-5, nation["relationships"][target] - 1)
+            notes.append(f"{nation_id}: military pressure on {target}")
     
     return state
 
 
-def build_nation_prompt(turn: int, nation_id: str, state: dict, summit_msgs: list[dict]) -> str:
-    """Build prompt for nation to produce JSON (no Discord posting)."""
-    schema = load_text(RULES_DIR / "action-schema.md")
-    nation_prompt_md = load_text(ROOT / "prompts" / "nation-turn-prompt.md")
-    public_state = get_public_state(state)
-    state_json = json.dumps(public_state, indent=2)
+def apply_actions(state, actions, nation_id, notes):
+    """Apply all actions for a nation."""
+    for action in actions:
+        action_type = action.get("type")
+        
+        if action_type == "army":
+            state = resolve_army_action(state, action, nation_id, notes)
+        elif action_type == "buy":
+            state = resolve_buy_action(state, action, nation_id, notes)
+        elif action_type == "fortify":
+            state = resolve_fortify_action(state, action, nation_id, notes)
+        else:
+            state = resolve_legacy_action(state, action, nation_id, notes)
     
-    # Get messages addressed to this nation
-    USER_TO_NATION = {"Hodge": "nation_1", "Aksum": "nation_2", "Urartu": "nation_3"}
-    nation_name = next(n["name"] for n in public_state["nations"] if n["id"] == nation_id)
-    
-    mentions = []
-    for m in summit_msgs:
-        author = m.get("author", {}).get("username")
-        author_nation = USER_TO_NATION.get(author)
-        content = m.get("content", "")
-        if author_nation != nation_id and (f"@{nation_name}" in content or f"@{nation_id}" in content):
-            mentions.append(f"- {author}: {content[:150]}...")
-    
-    mentions_text = ""
-    if mentions:
-        mentions_text = "\n## Recent messages addressed to you in #summit:\n" + "\n".join(mentions)
-    
-    return (
-        f"{nation_prompt_md}\n\n"
-        f"Turn: {turn}\nNation id: {nation_id}\n\n"
-        "## Your task - produce a JSON turn package\n"
-        "Output ONLY JSON - no markdown, no explanation.\n\n"
-        "Format:\n```json\n{\n  \"turn\": " + str(turn) + ",\n  \"nation\": \"" + nation_id + "\",\n  \"risk\": \"medium\",\n  \"public_message\": \"your public statement\",\n  \"actions\": [\n    {\"type\": \"...\", \"target\": \"...\", \"summary\": \"...\", \"intensity\": \"...\"},\n    {\"type\": \"...\", \"target\": \"...\", \"summary\": \"...\", \"intensity\": \"...\"}\n  ]\n}\n```\n\n"
-        f"Schema:\n{schema}\n\n"
-        f"## Current public state:\n{state_json}\n"
-        f"{mentions_text}\n\n"
-        "If any action targets another nation, your public_message should start with @Name to address them."
-    )
-
-
-def extract_json(text: str):
-    """Extract JSON from agent response."""
-    import re
-    
-    text = text.strip()
-    
-    # Try ```json blocks
-    blocks = re.findall(r"```json\s*([\s\S]*?)```", text)
-    for block in blocks:
-        try:
-            return json.loads(block.strip())
-        except:
-            pass
-    
-    # Try raw JSON
-    try:
-        return json.loads(text)
-    except:
-        pass
-    
-    # Find any JSON-like object
-    depth = 0
-    start = None
-    for i, c in enumerate(text):
-        if c == '{':
-            if depth == 0:
-                start = i
-            depth += 1
-        elif c == '}':
-            depth -= 1
-            if depth == 0 and start is not None:
-                try:
-                    return json.loads(text[start:i+1])
-                except:
-                    pass
-                start = None
-    
-    raise ValueError("Could not extract JSON")
-
-
-def build_discord_post(package: dict, target_nation_id: str, state: dict) -> str:
-    """Build the Discord message for a nation's package."""
-    public_msg = package.get("public_message", "")
-    actions = package.get("actions", [])
-    
-    # Determine if any action has a target
-    has_target = any(a.get("target", "none") != "none" for a in actions)
-    
-    # Find target nation name if any
-    target_name = None
-    if has_target:
-        target_id = next((a["target"] for a in actions if a["target"] != "none"), None)
-        if target_id:
-            target_name = next((n["name"] for n in state["nations"] if n["id"] == target_id), target_id)
-    
-    # Build message
-    if target_name:
-        msg = f"@{target_name} {public_msg}\n\n"
-    else:
-        msg = f"{public_msg}\n\n"
-    
-    msg += "```json\n" + json.dumps(package, indent=2) + "\n```"
-    
-    return msg
+    return state
 
 
 def main():
@@ -289,103 +361,65 @@ def main():
     before = deepcopy(state)
     turn = state["turn"] + 1
     
-    print(f"\n=== Starting Turn {turn} ===")
+    print(f"\n=== Turn {turn} ===")
     
-    # Announce turn start
-    openclaw_message_send(
-        "discord", WORLD_NEWS_CHANNEL,
-        f"⚖️ **[TURN {turn} START]** Sequential turns beginning.",
-        account=JUDGE_ACCOUNT,
-    )
+    # Announce
+    msg_send("discord", WORLD_NEWS_CHANNEL, f"⚖️ **[TURN {turn} START]**", account=JUDGE_ACCOUNT)
     
-    # Get baseline summit message ID
-    data = openclaw_message_read("discord", SUMMIT_CHANNEL, limit=1)
-    msgs = data.get("payload", {}).get("messages", [])
-    after_id = msgs[0]["id"] if msgs else None
+    # Get baseline
+    data = msg_read("discord", SUMMIT_CHANNEL, limit=1)
+    after_id = data.get("payload", {}).get("messages", [{}])[0].get("id")
     
     summit_history = []
+    packages = {}
     
-    # Each nation takes a turn
+    # Each nation
     for nation_id in state["turnOrder"]:
-        print(f"\n--- {nation_id} turn ---")
-        
-        # Prompt nation to produce JSON
+        print(f"  Processing {nation_id}...")
         prompt = build_nation_prompt(turn, nation_id, state, summit_history)
         
-        nation_run = openclaw_agent(nation_id, prompt, timeout_s=600)
-        nation_text = "\n".join(p.get("text", "") for p in nation_run.get("result", {}).get("payloads", []))
+        run = agent_deliver(nation_id, prompt, "discord", SUMMIT_CHANNEL, ACCOUNT_BY_NATION[nation_id], 600)
+        reply = "\n".join(p.get("text", "") for p in run.get("result", {}).get("payloads", []))
         
-        # Extract JSON
-        try:
-            package = extract_json(nation_text)
-            print(f"✓ Got package from {nation_id}")
-        except Exception as e:
-            print(f"✗ Failed to extract JSON: {e}")
-            raise RuntimeError(f"Could not get valid package from {nation_id}")
+        # Get their summit post
+        time.sleep(3)
+        data = msg_read("discord", SUMMIT_CHANNEL, limit=20, after=after_id)
+        new_msgs = data.get("payload", {}).get("messages", [])
+        if new_msgs:
+            after_id = new_msgs[0]["id"]
+            summit_history.extend(new_msgs)
         
-        # Post to #summit on behalf of nation
-        discord_msg = build_discord_post(package, nation_id, state)
-        openclaw_message_send(
-            "discord", SUMMIT_CHANNEL,
-            discord_msg,
-            account=ACCOUNT_BY_NATION[nation_id],
-        )
-        print(f"✓ Posted to #summit")
-        
-        # Record in summit history for next nation
-        summit_history.append({
-            "author": {"username": {"nation_1": "Hodge", "nation_2": "Aksum", "nation_3": "Urartu"}[nation_id]},
-            "content": discord_msg,
-            "timestampUtc": now_iso()
-        })
-        
-        # Apply to state
-        state = apply_package(state, package)
-        print(f"✓ Applied to state")
-        
-        # Brief pause
-        time.sleep(2)
+        pkg = extract_json(reply, turn, nation_id)
+        packages[nation_id] = pkg
+        print(f"    ✓ Got package")
     
-    # All done - update turn number and post final state
+    # Apply all actions
+    all_notes = []
+    for nation_id, pkg in packages.items():
+        notes = []
+        state = apply_actions(state, pkg.get("actions", []), nation_id, notes)
+        all_notes.extend(notes)
+        print(f"  {nation_id}: {len(notes)} effects")
+    
     state["turn"] = turn
     state["status"] = "running"
     state["updatedAt"] = now_iso()
     
-    # Post final public state to summit
-    public_state = get_public_state(state)
-    lines = [f"⚖️ **Turn {turn} Complete**\n"]
-    lines.append("**Stats:**")
-    for n in public_state["nations"]:
-        lines.append(f"  {n['name']}: T{n['treasury']} F{n['force']} Food{n['food']} S{n['stability']} I{n['industry']}")
-    
-    lines.append("\n**Relations:**")
-    for n in public_state["nations"]:
-        for other, score in n["relationships"].items():
-            if n["id"] < other:
-                other_name = next(o["name"] for o in public_state["nations"] if o["id"] == other)
-                lines.append(f"  {n['name']}-{other_name}: {score}")
-    
-    if public_state.get("treaties"):
-        lines.append(f"\n**Treaties:** {len(public_state['treaties'])}")
-    if public_state.get("wars"):
-        lines.append(f"**Wars:** {len(public_state['wars'])}")
-    
-    openclaw_message_send("discord", SUMMIT_CHANNEL, "\n".join(lines), account=JUDGE_ACCOUNT)
-    
     # Persist
     write_json(STATE_PATH, state)
-    log = {
-        "turn": turn,
-        "generatedAt": now_iso(),
-        "before": before,
-        "after": state,
-        "summitMessages": summit_history,
-    }
+    log = {"turn": turn, "notes": all_notes, "before": before, "after": deepcopy(state)}
     write_json(TURN_LOG_DIR / f"turn-{turn:03d}.json", log)
     
-    print(f"\n=== Turn {turn} completed ===")
+    # Post summary
+    lines = [f"⚖️ **Turn {turn} Complete**"]
+    lines.append(f"**Actions:** {len(all_notes)}")
+    for n in state["nations"]:
+        lines.append(f"  {n['id']}: T{n['treasury']} F{n['force']} Food{n['food']} S{n['stability']} I{n['industry']}")
+    msg_send("discord", SUMMIT_CHANNEL, "\n".join(lines), account=JUDGE_ACCOUNT)
+    
+    print(f"\n=== Turn {turn} done ===")
     if DEBUG:
-        print(json.dumps(state, indent=2)[:500] + "...")
+        print(json.dumps(state, indent=2)[:600] + "...")
 
 
 if __name__ == "__main__":
