@@ -201,6 +201,8 @@ The repo now supports two useful local paths:
 
 - `python3 UN/scripts/test_vertical_slice.py` — deterministic scripted 3-turn smoke test
 - `python3 UN/scripts/run_live_turn.py` — generate one new turn by letting each nation workspace produce a package based on its own doctrine and the current canonical state, then let the judge resolve and persist it
+- `python3 UN/scripts/run_llm_turn.py` — generate one new turn by calling the nation agents + judge agent offline (CLI-driven)
+- `python3 UN/scripts/run_discord_turn.py` — generate one new turn *through Discord*: nations publish in `#summit`, judge reads `#summit`, judge publishes to `#world-news`
 
 `run_live_turn.py` is the first real wiring layer between:
 
