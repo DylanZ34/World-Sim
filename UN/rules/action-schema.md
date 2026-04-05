@@ -1,29 +1,30 @@
-# Nation Turn Package Schema v0.1
+# Nation Turn Package Schema v0.2
 
 Each nation submits exactly one package per turn.
 
 The package should be easy for both a judge agent and a human reader to parse.
 
-## JSON shape
+## JSON shape (v0.2 with territory)
 
 ```json
 {
   "turn": 1,
   "nation": "nation_1",
   "risk": "medium",
-  "public_message": "The Republic of Hodges calls for orderly trade and mutual restraint.",
+  "public_message": "The Republic of Hodges expands eastward.",
   "actions": [
     {
-      "type": "diplomacy",
-      "target": "nation_2",
-      "summary": "Offer a limited trade and non-aggression framework.",
-      "intensity": "medium"
+      "type": "army",
+      "source": "city_0",
+      "target": "city_3",
+      "unit": "legion",
+      "count": 2,
+      "mission": "conquer"
     },
     {
-      "type": "infrastructure",
-      "target": "none",
-      "summary": "Expand domestic port and customs capacity.",
-      "intensity": "medium"
+      "type": "buy",
+      "target": "city_2",
+      "nation": "nation_1"
     }
   ]
 }
@@ -34,99 +35,80 @@ The package should be easy for both a judge agent and a human reader to parse.
 - `turn` must match the active world turn
 - `nation` must match the acting nation
 - `risk` must be one of: `low`, `medium`, `high`
-- `actions` must contain exactly 2 items in v0.1
-- each action must include `type`, `target`, `summary`, and `intensity`
-- `intensity` must be one of: `low`, `medium`, `high`
-- `target` should be another nation id or `none`
-- action summaries must be concrete and operational, not vague slogans
+- `actions` must contain exactly 2 items in v0.2
+- each action must include all required fields for its type
+- action count must be exactly 2
 
-## Allowed action types
+## Action Types
 
-- `diplomacy`
-- `economy`
-- `military`
-- `internal`
-- `infrastructure`
+### army (v0.2)
+```json
+{
+  "type": "army",
+  "source": "city_id",  // Your city
+  "target": "city_id",  // Target city
+  "unit": "legion",     // militia, soldier, legion, cavalry, siege
+  "count": 1,           // Number of units
+  "mission": "conquer"   // conquer, raid, defend
+}
+```
 
-## Guidance by action type
+### buy (v0.2)
+```json
+{
+  "type": "buy",
+  "target": "city_id",
+  "nation": "nation_1"  // Your nation ID
+}
+```
 
-### `diplomacy`
-Use for:
-- treaty offers
-- trade deals
-- recognition statements
-- warnings
-- alliance exploration
-- public de-escalation
+### fortify (v0.2)
+```json
+{
+  "type": "fortify",
+  "target": "city_id"
+}
+```
 
-### `economy`
-Use for:
-- tax changes
-- trade expansion
-- industrial investment
-- market or treasury measures
-- resource extraction policy
-
-### `military`
-Use for:
-- mobilization
-- deterrence
-- patrols
-- border reinforcement
-- punitive expedition
-- exercises or shows of force
-
-### `internal`
-Use for:
-- reforms
-- public order measures
-- legitimacy campaigns
-- relief spending
-- anti-corruption drives
-- elite balancing
-
-### `infrastructure`
-Use for:
-- roads
-- ports
-- irrigation
-- forts
-- depots
-- logistics and productive capacity improvements
+### economy, infrastructure, internal, diplomacy, military
+Same as v0.1.
 
 ## Invalid examples
 
-### Too vague
-
+### Not enough population
 ```json
 {
-  "type": "economy",
-  "target": "none",
-  "summary": "Improve the country",
-  "intensity": "medium"
+  "type": "army",
+  "source": "city_0",
+  "target": "city_1",
+  "unit": "legion",
+  "count": 10  // Exceeds population
 }
 ```
 
-### Missing target
-
+### Target not connected
 ```json
 {
-  "type": "diplomacy",
-  "summary": "Talk to nation_2",
-  "intensity": "low"
+  "type": "army",
+  "source": "city_0",
+  "target": "city_9",  // Not connected to source
+  "unit": "soldier",
+  "count": 1
 }
 ```
 
-### Wrong action count
+## Cost Reference
 
-A package with 1 or 3+ actions is invalid in v0.1.
+| Unit | Population Cost |
+|------|-----------------|
+| militia | 1 |
+| soldier | 2 |
+| legion | 3 |
+| cavalry | 3 |
+| siege | 4 |
 
-## Judge handling of malformed packages
-
-If a package is malformed, the judge should:
-
-1. salvage intent if possible
-2. downgrade effectiveness if clarity is poor
-3. avoid blocking the whole turn unless the package is unusable
-
-Momentum matters more than bureaucratic perfection.
+| Buy Cost | Nation Industry |
+|----------|-----------------|
+| 2 | 0-1 |
+| 1 | 2-3 |
+| 1 | 4+ |
