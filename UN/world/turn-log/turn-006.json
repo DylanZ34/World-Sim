@@ -1,0 +1,152 @@
+{
+  "turn": 6,
+  "notes": [
+    "nation_1: economy +1",
+    "nation_1: internal +1",
+    "nation_2: economy +1",
+    "nation_2: infrastructure +1",
+    "nation_3: invalid city in army action"
+  ],
+  "before": {
+    "turn": 5,
+    "status": "running",
+    "turnOrder": [
+      "nation_1",
+      "nation_2",
+      "nation_3"
+    ],
+    "nations": [
+      {
+        "id": "nation_1",
+        "agenda": {
+          "id": "diplomatic_victory",
+          "name": "Diplomatic Victory",
+          "description": "Win through alliances",
+          "weight": 30
+        },
+        "treasury": 8,
+        "force": 4,
+        "food": 6,
+        "stability": 8,
+        "industry": 10,
+        "relationships": {
+          "nation_2": 2,
+          "nation_3": 1
+        }
+      },
+      {
+        "id": "nation_2",
+        "agenda": {
+          "id": "trade_empire",
+          "name": "Trade Empire",
+          "description": "Wealth through trade",
+          "weight": 40
+        },
+        "treasury": 10,
+        "force": 5,
+        "food": 5,
+        "stability": 6,
+        "industry": 10,
+        "relationships": {
+          "nation_1": 2,
+          "nation_3": 0
+        }
+      },
+      {
+        "id": "nation_3",
+        "agenda": {
+          "id": "military_might",
+          "name": "Military Might",
+          "description": "Build unstoppable army",
+          "weight": 40
+        },
+        "treasury": 6,
+        "force": 7,
+        "food": 6,
+        "stability": 8,
+        "industry": 6,
+        "relationships": {
+          "nation_1": 1,
+          "nation_2": 0
+        }
+      }
+    ],
+    "treaties": [],
+    "wars": [],
+    "publicEvents": [
+      "The world enters its first monitored turn under judge supervision."
+    ],
+    "updatedAt": "2026-04-05T22:48:47.591691+00:00"
+  },
+  "after": {
+    "turn": 6,
+    "status": "running",
+    "turnOrder": [
+      "nation_1",
+      "nation_2",
+      "nation_3"
+    ],
+    "nations": [
+      {
+        "id": "nation_1",
+        "agenda": {
+          "id": "diplomatic_victory",
+          "name": "Diplomatic Victory",
+          "description": "Win through alliances",
+          "weight": 30
+        },
+        "treasury": 9,
+        "force": 4,
+        "food": 6,
+        "stability": 9,
+        "industry": 10,
+        "relationships": {
+          "nation_2": 2,
+          "nation_3": 1
+        }
+      },
+      {
+        "id": "nation_2",
+        "agenda": {
+          "id": "trade_empire",
+          "name": "Trade Empire",
+          "description": "Wealth through trade",
+          "weight": 40
+        },
+        "treasury": 10,
+        "force": 5,
+        "food": 5,
+        "stability": 6,
+        "industry": 10,
+        "relationships": {
+          "nation_1": 2,
+          "nation_3": 0
+        }
+      },
+      {
+        "id": "nation_3",
+        "agenda": {
+          "id": "military_might",
+          "name": "Military Might",
+          "description": "Build unstoppable army",
+          "weight": 40
+        },
+        "treasury": 6,
+        "force": 7,
+        "food": 6,
+        "stability": 8,
+        "industry": 6,
+        "relationships": {
+          "nation_1": 1,
+          "nation_2": 0
+        }
+      }
+    ],
+    "treaties": [],
+    "wars": [],
+    "publicEvents": [
+      "The world enters its first monitored turn under judge supervision."
+    ],
+    "updatedAt": "2026-04-05T22:51:58.358568+00:00"
+  }
+}
