@@ -7,7 +7,7 @@
       "y": 0.09999999999999998,
       "is_capital": true,
       "owner": "nation_1",
-      "size": 5,
+      "size": 6,
       "fortification": 3
     },
     "city_1": {
@@ -17,7 +17,7 @@
       "y": 0.7,
       "is_capital": true,
       "owner": "nation_2",
-      "size": 5,
+      "size": 7,
       "fortification": 5
     },
     "city_2": {
@@ -27,78 +27,78 @@
       "y": 0.7000000000000002,
       "is_capital": true,
       "owner": "nation_3",
-      "size": 6,
+      "size": 7,
       "fortification": 6
     },
     "city_3": {
       "id": "city_3",
-      "name": "Valleyville",
-      "x": 0.5043397733221703,
-      "y": 0.7574120374222496,
-      "is_capital": false,
-      "owner": null,
-      "size": 4,
-      "fortification": 4
-    },
-    "city_4": {
-      "id": "city_4",
-      "name": "Plaincrest",
-      "x": 0.4824756190978573,
-      "y": 0.24975094452031668,
-      "is_capital": false,
-      "owner": null,
-      "size": 6,
-      "fortification": 1
-    },
-    "city_5": {
-      "id": "city_5",
-      "name": "Forthold",
-      "x": 0.596247087195641,
-      "y": 0.8925259477526917,
-      "is_capital": false,
-      "owner": null,
-      "size": 3,
-      "fortification": 2
-    },
-    "city_6": {
-      "id": "city_6",
-      "name": "Plainwatch",
-      "x": 0.33313532595954853,
-      "y": 0.45231747423775137,
-      "is_capital": false,
-      "owner": null,
-      "size": 6,
-      "fortification": 4
-    },
-    "city_7": {
-      "id": "city_7",
-      "name": "Valleyport",
-      "x": 0.4830047554462248,
-      "y": 0.40151871021117713,
-      "is_capital": false,
-      "owner": null,
-      "size": 4,
-      "fortification": 1
-    },
-    "city_8": {
-      "id": "city_8",
-      "name": "Coasthold",
-      "x": 0.3114603791988795,
-      "y": 0.8360960141430923,
+      "name": "Plainport",
+      "x": 0.893924113822448,
+      "y": 0.5385521815458485,
       "is_capital": false,
       "owner": null,
       "size": 5,
       "fortification": 4
     },
-    "city_9": {
-      "id": "city_9",
-      "name": "Coastford",
-      "x": 0.3203688038623054,
-      "y": 0.27878244213624825,
+    "city_4": {
+      "id": "city_4",
+      "name": "Rivervale",
+      "x": 0.6397339662369277,
+      "y": 0.4417703095095873,
       "is_capital": false,
       "owner": null,
       "size": 6,
+      "fortification": 4
+    },
+    "city_5": {
+      "id": "city_5",
+      "name": "Mountainton",
+      "x": 0.19260550154908726,
+      "y": 0.3075883388525605,
+      "is_capital": false,
+      "owner": null,
+      "size": 4,
       "fortification": 3
+    },
+    "city_6": {
+      "id": "city_6",
+      "name": "Valleyburg",
+      "x": 0.690729814202316,
+      "y": 0.6682129849387022,
+      "is_capital": false,
+      "owner": null,
+      "size": 5,
+      "fortification": 4
+    },
+    "city_7": {
+      "id": "city_7",
+      "name": "Coastvale",
+      "x": 0.4327607967570808,
+      "y": 0.6673715242836795,
+      "is_capital": false,
+      "owner": null,
+      "size": 5,
+      "fortification": 2
+    },
+    "city_8": {
+      "id": "city_8",
+      "name": "Lakevale",
+      "x": 0.3295372869797991,
+      "y": 0.8150582340679935,
+      "is_capital": false,
+      "owner": null,
+      "size": 3,
+      "fortification": 1
+    },
+    "city_9": {
+      "id": "city_9",
+      "name": "Riverhold",
+      "x": 0.11885327420311009,
+      "y": 0.8672462553893298,
+      "is_capital": false,
+      "owner": null,
+      "size": 4,
+      "fortification": 2
     }
   },
   "connections": [
@@ -108,63 +108,7 @@
     ],
     [
       "city_0",
-      "city_9"
-    ],
-    [
-      "city_1",
       "city_5"
-    ],
-    [
-      "city_1",
-      "city_3"
-    ],
-    [
-      "city_2",
-      "city_8"
-    ],
-    [
-      "city_2",
-      "city_6"
-    ],
-    [
-      "city_3",
-      "city_5"
-    ],
-    [
-      "city_3",
-      "city_8"
-    ],
-    [
-      "city_4",
-      "city_7"
-    ],
-    [
-      "city_5",
-      "city_8"
-    ],
-    [
-      "city_6",
-      "city_7"
-    ],
-    [
-      "city_6",
-      "city_9"
-    ],
-    [
-      "city_4",
-      "city_9"
-    ],
-    [
-      "city_0",
-      "city_7"
-    ],
-    [
-      "city_0",
-      "city_3"
-    ],
-    [
-      "city_0",
-      "city_1"
     ],
     [
       "city_1",
@@ -172,23 +116,71 @@
     ],
     [
       "city_1",
+      "city_3"
+    ],
+    [
+      "city_2",
+      "city_9"
+    ],
+    [
+      "city_2",
+      "city_8"
+    ],
+    [
+      "city_3",
+      "city_6"
+    ],
+    [
+      "city_4",
+      "city_6"
+    ],
+    [
+      "city_3",
       "city_4"
     ],
     [
-      "city_1",
+      "city_2",
+      "city_5"
+    ],
+    [
+      "city_7",
+      "city_8"
+    ],
+    [
+      "city_6",
+      "city_7"
+    ],
+    [
+      "city_8",
+      "city_9"
+    ],
+    [
+      "city_0",
       "city_2"
     ],
     [
       "city_2",
-      "city_7"
+      "city_6"
+    ],
+    [
+      "city_3",
+      "city_5"
     ],
     [
       "city_4",
-      "city_8"
+      "city_9"
     ],
     [
-      "city_5",
+      "city_2",
+      "city_4"
+    ],
+    [
+      "city_7",
       "city_9"
+    ],
+    [
+      "city_3",
+      "city_7"
     ]
   ],
   "num_cities": 10,
