@@ -21,7 +21,7 @@ WORLD_NEWS_CHANNEL = "channel:1482491117734985808"
 ACCOUNT_BY_NATION = {"nation_1": "nation1bot", "nation_2": "nation2bot", "nation_3": "nation3bot"}
 JUDGE_ACCOUNT = "judgebot"
 
-DEBUG = True
+DEBUG = False  # False=readable, True=JSON in summit
 
 UNIT_STATS = {
     "militia": {"cost": 1, "attack": 1, "defense": 1},
@@ -132,29 +132,29 @@ def get_public_state(state):
     }
 
 
-def build_nation_prompt(turn, nation_id, state, summit_msgs):
+def build_nation_prompt(turn, nation_id, state, summit_msgs, debug=False):
     schema = (RULES_DIR / "action-schema.md").read_text()
     public = get_public_state(state)
     state_json = json.dumps(public, indent=2)
+    nation_names = {"nation_1": "Hodges", "nation_2": "Aksum", "nation_3": "Urartu"}
+    
+    debug_note = "\n\n## DEBUG MODE: ON\nInclude your full JSON in the message as ```json block```" if debug else ""
     
     return (
-        f"Turn: {turn}\nNation id: {nation_id}\n\n"
-        "## Your agenda\n"
-        f"Your nation's goal: {state['nations'][turn-1]['agenda']['name']}\n\n"
-        "## Output format\n"
-        "Output exactly ONE message in #summit with:\n"
-        "1. Public statement (addressed if targeting)\n"
-        "2. ```json``` block, 2 actions\n\n"
-        "## Action types (v0.2 - TERRITORY ENABLED)\n"
-        "### army (conquest)\n"
-        '{"type":"army","source":"city_X","target":"city_Y","unit":"soldier","count":1,"mission":"conquer"}\n'
-        "### buy (purchase neutral)\n"
-        '{"type":"buy","target":"city_X"}\n'
-        "### fortify (defense)\n"
-        '{"type":"fortify","target":"city_X"}\n'
-        "### economy/infrastructure/internal/diplomacy/military (v0.1)\n"
-        '{"type":"economy","target":"none","summary":"...","intensity":"medium"}\n\n'
-        f"Schema:\n{schema}\n\nState:\n{state_json}"
+        f"Turn: {turn}\nNation id: {nation_id}\n"
+        f"Your agenda: {state['nations'][int(nation_id.split('_')[1])-1]['agenda']['name']}\n\n"
+        f"## Your Task\n"
+        f"Post ONE message in #summit with:\n"
+        f"1. Public statement (readable, 1-3 lines) - address @{nation_names.get(nation_id, nation_id)} if targeting\n"
+        f"2. Two actions you take this turn\n\n"
+        "## Available Actions\n"
+        "### TERRITORY (v0.2)\n"
+        "- army: {'type':'army','source':'city_X','target':'city_Y','unit':'soldier','count':1,'mission':'conquer'}\n"
+        "- buy: {'type':'buy','target':'city_X'}  (buy neutral city)\n"
+        "- fortify: {'type':'fortify','target':'city_X'}  (+defense)\n\n"
+        "### LEGACY\n"
+        "- economy, infrastructure, internal, diplomacy, military (v0.1 format)\n\n"
+        f"## Current State\n{state_json}{debug_note}"
     )
 
 
