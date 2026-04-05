@@ -1,5 +1,5 @@
 {
-  "turn": 5,
+  "turn": 6,
   "status": "running",
   "turnOrder": [
     "nation_1",
@@ -14,16 +14,16 @@
       "force": 5,
       "food": 6,
       "stability": 8,
-      "industry": 9,
+      "industry": 10,
       "relationships": {
         "nation_2": 5,
-        "nation_3": 1
+        "nation_3": 3
       }
     },
     {
       "id": "nation_2",
       "name": "Aksumite League",
-      "treasury": 8,
+      "treasury": 9,
       "force": 7,
       "food": 5,
       "stability": 6,
@@ -36,13 +36,13 @@
     {
       "id": "nation_3",
       "name": "Kingdom of Urartu",
-      "treasury": 2,
+      "treasury": 3,
       "force": 9,
       "food": 9,
       "stability": 9,
-      "industry": 8,
+      "industry": 9,
       "relationships": {
-        "nation_1": 1,
+        "nation_1": 3,
         "nation_2": -3
       }
     }
@@ -53,7 +53,7 @@
         "nation_1",
         "nation_2"
       ],
-      "type": "trade-corridor-compact"
+      "type": "alignment"
     }
   ],
   "wars": [],
@@ -89,5 +89,5 @@
     "- The Aksum\u2013Urartu frontier entered a higher-alert, heavily patrolled posture; tensions deepened without open conflict.",
     "- Status snapshot: nation_1 T6 F5 Food6 S8 I9, nation_2 T8 F7 Food5 S6 I10, nation_3 T2 F9 Food9 S9 I8"
   ],
-  "updatedAt": "2026-03-19T04:26:31.351070+00:00"
+  "updatedAt": "2026-04-05T19:24:50.573971+00:00"
 }
