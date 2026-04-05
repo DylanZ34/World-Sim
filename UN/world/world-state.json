@@ -1,5 +1,5 @@
 {
-  "turn": 2,
+  "turn": 3,
   "status": "running",
   "turnOrder": [
     "nation_1",
@@ -21,8 +21,8 @@
       "stability": 7,
       "industry": 7,
       "relationships": {
-        "nation_2": 1,
-        "nation_3": 0
+        "nation_2": 2,
+        "nation_3": 1
       }
     },
     {
@@ -33,13 +33,13 @@
         "description": "Wealth through trade",
         "weight": 40
       },
-      "treasury": 8,
+      "treasury": 9,
       "force": 5,
       "food": 5,
       "stability": 6,
-      "industry": 8,
+      "industry": 10,
       "relationships": {
-        "nation_1": 1,
+        "nation_1": 2,
         "nation_3": 0
       }
     },
@@ -57,7 +57,7 @@
       "stability": 7,
       "industry": 6,
       "relationships": {
-        "nation_1": 0,
+        "nation_1": 1,
         "nation_2": 0
       }
     }
@@ -67,5 +67,5 @@
   "publicEvents": [
     "The world enters its first monitored turn under judge supervision."
   ],
-  "updatedAt": "2026-04-05T22:17:24.284201+00:00"
+  "updatedAt": "2026-04-05T22:30:54.033557+00:00"
 }
