@@ -9,7 +9,12 @@
   "nations": [
     {
       "id": "nation_1",
-      "name": "Republic of Hodges",
+      "agenda": {
+        "id": "diplomatic_victory",
+        "name": "Diplomatic Victory",
+        "description": "Win through alliances",
+        "weight": 30
+      },
       "treasury": 6,
       "force": 4,
       "food": 6,
@@ -22,7 +27,12 @@
     },
     {
       "id": "nation_2",
-      "name": "Aksumite League",
+      "agenda": {
+        "id": "trade_empire",
+        "name": "Trade Empire",
+        "description": "Wealth through trade",
+        "weight": 40
+      },
       "treasury": 7,
       "force": 5,
       "food": 5,
@@ -35,7 +45,12 @@
     },
     {
       "id": "nation_3",
-      "name": "Kingdom of Urartu",
+      "agenda": {
+        "id": "military_might",
+        "name": "Military Might",
+        "description": "Build unstoppable army",
+        "weight": 40
+      },
       "treasury": 5,
       "force": 7,
       "food": 6,
@@ -47,232 +62,10 @@
       }
     }
   ],
-  "cityOwnership": {
-    "city_0": "nation_1",
-    "city_1": "nation_2",
-    "city_2": "nation_3",
-    "city_3": null,
-    "city_4": null,
-    "city_5": null,
-    "city_6": null,
-    "city_7": null,
-    "city_8": null,
-    "city_9": null
-  },
-  "cities": {
-    "city_0": {
-      "id": "city_0",
-      "name": "Hodges Capital",
-      "x": 0.5,
-      "y": 0.09999999999999998,
-      "population": 8,
-      "fortification": 4,
-      "size": 10,
-      "owner": "nation_1",
-      "units": []
-    },
-    "city_1": {
-      "id": "city_1",
-      "name": "Aksum Capital",
-      "x": 0.8464101615137756,
-      "y": 0.7,
-      "population": 8,
-      "fortification": 4,
-      "size": 10,
-      "owner": "nation_2",
-      "units": []
-    },
-    "city_2": {
-      "id": "city_2",
-      "name": "Urartu Capital",
-      "x": 0.1535898384862246,
-      "y": 0.7000000000000002,
-      "population": 8,
-      "fortification": 4,
-      "size": 10,
-      "owner": "nation_3",
-      "units": []
-    },
-    "city_3": {
-      "id": "city_3",
-      "name": "Valleyton",
-      "x": 0.3152765078402593,
-      "y": 0.5503092250548574,
-      "population": 4,
-      "fortification": 2,
-      "size": 6,
-      "owner": null,
-      "units": []
-    },
-    "city_4": {
-      "id": "city_4",
-      "name": "Bayburg",
-      "x": 0.431148331304924,
-      "y": 0.7817933721097273,
-      "population": 4,
-      "fortification": 2,
-      "size": 6,
-      "owner": null,
-      "units": []
-    },
-    "city_5": {
-      "id": "city_5",
-      "name": "Valleyport",
-      "x": 0.5959269424954027,
-      "y": 0.6487903894452381,
-      "population": 4,
-      "fortification": 2,
-      "size": 6,
-      "owner": null,
-      "units": []
-    },
-    "city_6": {
-      "id": "city_6",
-      "name": "Rivervale",
-      "x": 0.13936955084494562,
-      "y": 0.16537756465436015,
-      "population": 4,
-      "fortification": 2,
-      "size": 6,
-      "owner": null,
-      "units": []
-    },
-    "city_7": {
-      "id": "city_7",
-      "name": "Laketon",
-      "x": 0.477414472479852,
-      "y": 0.3120010349695773,
-      "population": 4,
-      "fortification": 2,
-      "size": 6,
-      "owner": null,
-      "units": []
-    },
-    "city_8": {
-      "id": "city_8",
-      "name": "Fortwatch",
-      "x": 0.707707009900825,
-      "y": 0.4406663185569383,
-      "population": 4,
-      "fortification": 2,
-      "size": 6,
-      "owner": null,
-      "units": []
-    },
-    "city_9": {
-      "id": "city_9",
-      "name": "Mountainville",
-      "x": 0.8396668323284077,
-      "y": 0.2386087098428223,
-      "population": 4,
-      "fortification": 2,
-      "size": 6,
-      "owner": null,
-      "units": []
-    }
-  },
-  "connections": [
-    [
-      "city_0",
-      "city_7"
-    ],
-    [
-      "city_0",
-      "city_6"
-    ],
-    [
-      "city_1",
-      "city_5"
-    ],
-    [
-      "city_1",
-      "city_8"
-    ],
-    [
-      "city_2",
-      "city_3"
-    ],
-    [
-      "city_2",
-      "city_4"
-    ],
-    [
-      "city_3",
-      "city_4"
-    ],
-    [
-      "city_4",
-      "city_5"
-    ],
-    [
-      "city_5",
-      "city_8"
-    ],
-    [
-      "city_6",
-      "city_7"
-    ],
-    [
-      "city_7",
-      "city_8"
-    ],
-    [
-      "city_8",
-      "city_9"
-    ],
-    [
-      "city_0",
-      "city_9"
-    ],
-    [
-      "city_2",
-      "city_5"
-    ],
-    [
-      "city_1",
-      "city_2"
-    ],
-    [
-      "city_0",
-      "city_3"
-    ],
-    [
-      "city_3",
-      "city_7"
-    ],
-    [
-      "city_1",
-      "city_3"
-    ],
-    [
-      "city_1",
-      "city_6"
-    ],
-    [
-      "city_5",
-      "city_6"
-    ],
-    [
-      "city_6",
-      "city_8"
-    ],
-    [
-      "city_2",
-      "city_9"
-    ],
-    [
-      "city_4",
-      "city_9"
-    ],
-    [
-      "city_7",
-      "city_9"
-    ]
-  ],
   "treaties": [],
   "wars": [],
   "publicEvents": [
     "The world enters its first monitored turn under judge supervision."
   ],
-  "updatedAt": null
+  "updatedAt": "2026-04-05T21:59:24.147694+00:00"
 }
