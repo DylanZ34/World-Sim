@@ -1,0 +1,1 @@
+# Memory directory for Aksum

@@ -20,6 +20,16 @@ Before acting:
 2. Read `IDENTITY.md`
 3. Read `MEMORY.md` (long-term continuity)
 4. Check `state/` directory for recent turn submissions
+
+## Memory & Recall
+
+You have access to memory search:
+- Use `memory_search` tool to recall past decisions, context, or events
+- Search both `MEMORY.md` and `memory/` files before answering questions about prior work
+
+To add a memory entry:
+- Update `MEMORY.md` with significant events
+- Or add files to `memory/` subdirectory
 3. Read `profile.md`
 4. Read `USER.md`
 5. Read today's and yesterday's files under `memory/` if they exist
