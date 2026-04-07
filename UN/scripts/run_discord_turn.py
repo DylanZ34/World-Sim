@@ -429,6 +429,42 @@ def main():
         lines.append(f"  {n['id']}: T{n['treasury']} F{n['force']} Food{n['food']} S{n['stability']} I{n['industry']} Pop={pop_count} City={city_count}")
     msg_send("discord", SUMMIT_CHANNEL, "\n".join(lines), account=JUDGE_ACCOUNT)
     
+    # === Update nation memory files ===
+    nation_names = {"nation_1": "Hodges", "nation_2": "Aksum", "nation_3": "Urartu"}
+    nation_dir = ROOT.parent / "nations"
+    for n in state["nations"]:
+        nid = n["id"]
+        city_count = sum(1 for c, o in state.get("cityOwnership", {}).items() if o == nid)
+        pop_count = sum(state.get("cities", {}).get(c, {}).get("population", 0) 
+                       for c, o in state.get("cityOwnership", {}).items() if o == nid)
+        
+        mem_path = nation_dir / nid / "MEMORY.md"
+        mem_path.write_text(f"""# MEMORY.md - {nation_names.get(nid, nid)} Long-Term Memory
+
+Last updated: {now_iso()[:10]}
+
+## Current State
+
+- **Turn:** {turn}
+- **Cities owned:** {city_count}
+- **Population:** {pop_count}
+- **Treasury:** {n.get('treasury', 0)}
+- **Industry:** {n.get('industry', 0)}
+
+## Relations
+
+{chr(10).join(f'- {tid}: {score:+d}' for tid, score in n.get('relationships', {}).items())}
+
+## Agenda
+
+**{n.get('agenda', {}).get('name', 'Unknown')}** - {n.get('agenda', {}).get('description', '')}
+
+## Notes
+
+(This gets updated each turn by the runner)
+""")
+    print(f"  ✓ Updated nation memories")
+    
     print(f"\n=== Turn {turn} done ===")
     if DEBUG:
         print(json.dumps(state, indent=2)[:600] + "...")

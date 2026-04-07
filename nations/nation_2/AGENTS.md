@@ -18,6 +18,8 @@ Before acting:
 
 1. Read `SOUL.md`
 2. Read `IDENTITY.md`
+3. Read `MEMORY.md` (long-term continuity)
+4. Check `state/` directory for recent turn submissions
 3. Read `profile.md`
 4. Read `USER.md`
 5. Read today's and yesterday's files under `memory/` if they exist
